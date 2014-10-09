@@ -11,28 +11,30 @@ import java.util.Properties;
 import javax.swing.*;
 
 import vitaTracker.Util.*;
+import vitaTracker.dataHandler.messungen.MessWert;
+import vitaTracker.dataHandler.messungen.Messung;
 
 
 public class MainWindow extends JFrame implements ActionListener, WindowListener, ItemListener
 {
 
-	JPanel 				chartPanel, eingabePanel, tfPanel;
-	JButton				btnMessungSpeichern, btnFelderLoeschen, btnDatenHolen,btnMessZeitSetzen;
-	JComboBox 			msngArt;
-	JMenuBar 			menuBar;
-	JMenu 				datei, extras;
-	JMenuItem 			miLoad, miSave, miExit;
-	JLabel				bdSys, bdDia, glucoVal, gewichtVal, messZeit;
-	JTextField			tfVal1, tfVal2 /*tfGlucoVal, tfGewichtVal*/, tfMessZeit;
-	JRadioButton		weightUnit;
-	String[]			strArrmessArten;
-	Date				dateMessung;
-	Calendar			calDateMess;
-	SimpleDateFormat	sDForm;
-	JComboBox<String> 	cBoxMessArten;
-	URL 				iconURL;
-	DateTimePicker 		dtp;
-	
+	private JPanel 				chartPanel, eingabePanel, tfPanel;
+	private JButton				btnMessungSpeichern, btnFelderLoeschen, btnDatenHolen,btnMessZeitSetzen;
+	private JComboBox<String>	msngArt;
+	private JMenuBar 			menuBar;
+	private JMenu 				datei, extras;
+	private JMenuItem 			miLoad, miSave, miExit;
+	private JLabel				bdSys, bdDia, glucoVal, gewichtVal, messZeit;
+	private JTextField			tfVal1, tfVal2 /*tfGlucoVal, tfGewichtVal*/, tfMessZeit;
+	private JRadioButton		weightUnit;
+	private String[]			strArrmessArten;
+	private Date				dateMessung;
+	private Calendar			calDateMess;
+	private SimpleDateFormat	sDForm;
+	private JComboBox<String> 	cBoxMessArten;
+	private URL 				iconURL;
+	private DateTimePicker 		dtp;
+	private Messung 			m;
 	
 	public MainWindow()
 	{
@@ -53,7 +55,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	private void initFrame()
 	{
-		// Heutigen Tag anzeigen, Graph f�r die letzten 24 Stunden zeichnen
+		// Heutigen Tag anzeigen, Graph fuer die letzten 24 Stunden zeichnen
 		// alle Felder leer, combobox auf defaultwert
 		
 	}
@@ -68,7 +70,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		this.setTitle("VitaTracker");
 		strArrmessArten = new String[] {"Blutdruck","Blutzucker","Gewicht"};
 		dateMessung = new Date(System.currentTimeMillis());
-		sDForm = new SimpleDateFormat("dd.mm.yyyy, HH:mm:ss");
+		sDForm = new SimpleDateFormat("dd.MM.yyyy, HH:mm:ss");
 		
 		
 		
@@ -102,6 +104,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		btnMessungSpeichern = new JButton("Messung Speichern");
 		btnMessungSpeichern.setBounds(15, 400, 150, 25);
+		btnMessungSpeichern.addActionListener(this);
 		eingabePanel.add(btnMessungSpeichern);
 		
 		bdSys = new JLabel("Systolischer Wert: ");
@@ -144,7 +147,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	{
 		
 			System.out.println("die Auswahl ist: " + cBoxMessArten.getSelectedItem().toString());
-		
+			System.out.println(cBoxMessArten.getSelectedIndex());
 	}
 
 
@@ -160,15 +163,46 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			this.dispose();
 		else if (o == btnMessZeitSetzen)
 			dtp = new DateTimePicker(this);
-		
+		else if (o == btnMessungSpeichern)
+		{ 
+			System.out.println(tfVal1.getText());
+			System.out.println(tfVal2.getText());
+			erzeugeMessung();
+//			System.out.println(m);
+		}
 	}
 
-
+	public void erzeugeMessung()
+	{
+		switch (cBoxMessArten.getSelectedIndex()) {
+		case 0:
+			this.m = new Messung(this.getDateMessung(),
+					Double.parseDouble(tfVal1.getText()),
+					Double.parseDouble(tfVal2.getText())
+					);
+			break;
+			
+		case 1:
+			m = new Messung(this.getDateMessung(),
+					Double.parseDouble(tfVal1.getText()));
+			break;
+		
+		case 2:
+			m = new Messung(this.getDateMessung(),
+					Double.parseDouble(tfVal1.getText()));
+			break;
+		
+		default:
+			break;
+		}
+		
+	
+		
+	}
+	
 	public Date getDateMessung()
 	{
-		
-			
-		
+				
 		return dateMessung;
 	}
 

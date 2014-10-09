@@ -1,31 +1,42 @@
 package vitaTracker.dataHandler.messungen;
 
-import java.sql.Date;
+import java.util.Date;
+
+/**
+ * 
+ * @author ben
+ *
+ *
+ */
 
 public class Messung
 {
 	private Date zp;
-	private double wert;
+	private double[] wert;
+	private enum messArt {blutDruck, gewicht, blutZucker};
 	
 	public Messung()
 	{
 		
 		this.zp = new Date(System.currentTimeMillis());
-		this.wert = 0.0;
+//		this.wert[0] = 0.0;
 		
 	}
 	
-	public Messung(double value)
+	public Messung (Date date, double value1, double value2)
 	{
 		this();
-		wert = value;
+		this.zp = date;
+		this.wert[0] = value1;
+		this.wert[1] = value2;
+		
 	}
 	
-	public Messung (Date date, double value)
+	public Messung (Date date, double value1)
 	{
 		this();
-		//this.zp = TODO
-		wert = value;
+		this.zp = date;
+		this.wert[0] = value1;
 		
 	}
 	
