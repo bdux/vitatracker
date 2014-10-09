@@ -3,18 +3,17 @@ package vitaTracker.userInterface;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
 
 import javax.swing.*;
 
-//import org.jfree.chart.JFreeChart;
-
 import vitaTracker.Util.*;
 
 
-public class MainWindow extends JFrame implements ActionListener, WindowListener
+public class MainWindow extends JFrame implements ActionListener, WindowListener, ItemListener
 {
 
 	JPanel 				chartPanel, eingabePanel, tfPanel;
@@ -25,9 +24,11 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	JMenuItem 			miLoad, miSave, miExit;
 	JLabel				bdSys, bdDia, glucoVal, gewichtVal, messZeit;
 	JTextField			tfVal1, tfVal2 /*tfGlucoVal, tfGewichtVal*/, tfMessZeit;
+	JRadioButton		weightUnit;
 	String[]			strArrmessArten;
 	Date				dateMessung;
 	Calendar			calDateMess;
+	SimpleDateFormat	sDForm;
 	JComboBox<String> 	cBoxMessArten;
 	URL 				iconURL;
 	DateTimePicker 		dtp;
@@ -67,6 +68,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		this.setTitle("VitaTracker");
 		strArrmessArten = new String[] {"Blutdruck","Blutzucker","Gewicht"};
 		dateMessung = new Date(System.currentTimeMillis());
+		sDForm = new SimpleDateFormat("dd.mm.yyyy, HH:mm:ss");
+		
+		
 		
 		cBoxMessArten = new JComboBox<String>(strArrmessArten);
 		cBoxMessArten.setSelectedItem(strArrmessArten[strArrmessArten.length-1]);
@@ -120,8 +124,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		eingabePanel.add(messZeit);
 		
 		
-		tfMessZeit = new JTextField(dateMessung.toString());
+		tfMessZeit = new JTextField(sDForm.format(dateMessung).toString());
 		tfMessZeit.setBounds(15, 160, 150, 25);
+		tfMessZeit.setEnabled(false);
 		eingabePanel.add(tfMessZeit);
 		
 		
@@ -171,7 +176,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	public void setDateMessung(Date dateMessung)
 	{
 		this.dateMessung = dateMessung;
-		tfMessZeit.setText(dateMessung.toString());
+		tfMessZeit.setText(sDForm.format(dateMessung).toString());
 	}
 
 
@@ -205,6 +210,14 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 
 	@Override
 	public void windowOpened(WindowEvent e)	{}
+
+
+	@Override
+	public void itemStateChanged(ItemEvent e) 
+	{
+		// TODO Auto-generated method stub
+		
+	}
 
 
 	public static void main(String[] args)
