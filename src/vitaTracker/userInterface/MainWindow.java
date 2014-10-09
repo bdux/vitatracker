@@ -18,7 +18,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 {
 
 	JPanel 				chartPanel, eingabePanel, tfPanel;
-	JButton				btnMessungSpeichern, btnFelderLöschen, btnDatenHolen,btnMessZeitSetzen;
+	JButton				btnMessungSpeichern, btnFelderLoeschen, btnDatenHolen,btnMessZeitSetzen;
 	JComboBox 			msngArt;
 	JMenuBar 			menuBar;
 	JMenu 				datei, extras;
@@ -52,7 +52,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	private void initFrame()
 	{
-		// Heutigen Tag anzeigen, Graph für die letzten 24 Stunden zeichnen
+		// Heutigen Tag anzeigen, Graph fï¿½r die letzten 24 Stunden zeichnen
 		// alle Felder leer, combobox auf defaultwert
 		
 	}
