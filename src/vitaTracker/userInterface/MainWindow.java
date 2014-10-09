@@ -24,7 +24,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	JMenu 				datei, extras;
 	JMenuItem 			miLoad, miSave, miExit;
 	JLabel				bdSys, bdDia, glucoVal, gewichtVal, messZeit;
-	JTextField			tfBdSys, tfBdDia, tfGlucoVal, tfGewichtVal, tfMessZeit;
+	JTextField			tfVal1, tfVal2 /*tfGlucoVal, tfGewichtVal*/, tfMessZeit;
 	String[]			strArrmessArten;
 	Date				dateMessung;
 	Calendar			calDateMess;
@@ -125,13 +125,13 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		eingabePanel.add(tfMessZeit);
 		
 		
-		tfBdSys = new JTextField();
-		tfBdSys.setBounds(15,35,75,25);
-		eingabePanel.add(tfBdSys);
+		tfVal1 = new JTextField();
+		tfVal1.setBounds(15,35,75,25);
+		eingabePanel.add(tfVal1);
 		
-		tfBdDia = new JTextField();
-		tfBdDia.setBounds(15,100,75,25);
-		eingabePanel.add(tfBdDia);
+		tfVal2 = new JTextField();
+		tfVal2.setBounds(15,100,75,25);
+		eingabePanel.add(tfVal2);
 		
 	}
 		
