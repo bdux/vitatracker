@@ -11,7 +11,7 @@ import java.util.Properties;
 import javax.swing.*;
 
 import vitaTracker.Util.*;
-import vitaTracker.dataHandler.messungen.MessWert;
+//import vitaTracker.dataHandler.messungen.MessWert;
 import vitaTracker.dataHandler.messungen.Messung;
 
 
