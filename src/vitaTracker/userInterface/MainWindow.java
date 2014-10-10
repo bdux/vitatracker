@@ -2,19 +2,25 @@ package vitaTracker.userInterface;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.Properties;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import vitaTracker.Util.*;
 //import vitaTracker.dataHandler.messungen.MessWert;
 import vitaTracker.dataHandler.messungen.Messung;
-
-
+/**
+ * 
+ * @author Benjamin Dux
+ *
+ */
 public class MainWindow extends JFrame implements ActionListener, WindowListener, ItemListener
 {
 
@@ -35,6 +41,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private URL 				iconURL;
 	private DateTimePicker 		dtp;
 	private Messung 			m;
+	private LinkedList<Object>	messungen = new LinkedList<Object>();
+	private File				file = new File("user.home");
 	
 	public MainWindow()
 	{
@@ -61,10 +69,14 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 	
 	
+	
+	/*
+	 * initialisiert die Fensterkomponenten
+	 */
 	private void initializeComponents()
 	{
 		
-		iconURL = getClass().getResource("120px-Health-stub.gif");
+		iconURL = getClass().getResource("120px-Flat_UI_-_clipboard.png");
 		ImageIcon icon = new ImageIcon(iconURL);
 		this.setIconImage(icon.getImage());
 		this.setTitle("VitaTracker");
@@ -147,7 +159,38 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	{
 		
 			System.out.println("die Auswahl ist: " + cBoxMessArten.getSelectedItem().toString());
-			System.out.println(cBoxMessArten.getSelectedIndex());
+			System.out.println(cBoxMessArten.getSelectedIndex() + " index");
+	}
+	
+	private void dateiLesen()
+	{
+		
+		JFileChooser fc = new JFileChooser();
+		
+		fc.setFileFilter(new FileNameExtensionFilter("Textdateien (*.txt)", "txt"));
+		fc.setAcceptAllFileFilterUsed(false);
+		fc.setDialogTitle("Textdatei Auswählen");
+		
+		
+		fc.setCurrentDirectory(file);
+		
+		
+		if (fc.showOpenDialog(this) != JFileChooser.APPROVE_OPTION)
+			{
+				return;
+			}
+		
+		fc.getSelectedFile();
+		
+//		dateiLesen(fc.getSelectedFile().toString());
+//		dateiLesenStringBuilder(fc.getSelectedFile().toString());
+		dateiLesenBufferedReader(fc.getSelectedFile().toString());
+	}
+	
+
+	private void dateiLesenBufferedReader(String string) {
+		// TODO Auto-generated method stub
+		
 	}
 
 
@@ -170,33 +213,53 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			erzeugeMessung();
 //			System.out.println(m);
 		}
+		else if (o == miLoad)
+			dateiLesen();
 	}
 
 	public void erzeugeMessung()
 	{
-		switch (cBoxMessArten.getSelectedIndex()) {
+		
+		switch (cBoxMessArten.getSelectedIndex()) 
+		{
+		
 		case 0:
-			this.m = new Messung(this.getDateMessung(),
-					Double.parseDouble(tfVal1.getText()),
-					Double.parseDouble(tfVal2.getText())
-					);
-			break;
-			
-		case 1:
-			m = new Messung(this.getDateMessung(),
-					Double.parseDouble(tfVal1.getText()));
-			break;
-		
-		case 2:
-			m = new Messung(this.getDateMessung(),
-					Double.parseDouble(tfVal1.getText()));
-			break;
-		
+			try 
+			{		
+				if (tfVal1.getText() != null &&tfVal2.getText() != null)
+				{
+					this.m = new Messung(this.getDateMessung(),
+							Double.parseDouble(tfVal1.getText()),
+							Double.parseDouble(tfVal2.getText())
+							);
+					break;
+				}	
+				
+			} catch (Exception e) {
+				System.out.println("geht nicht!");
+			}
+		break;
+					
 		default:
-			break;
+			
+			try 
+			{		
+				if (tfVal1.getText() != null )
+				{
+					this.m = new Messung(this.getDateMessung(),
+							Double.parseDouble(tfVal1.getText())
+							);
+					break;
+				}	
+				
+			} catch (Exception e) {
+				System.out.println("geht nicht!");
+			}
+		break;
+			
 		}
 		
-	
+		messungen.add(m);
 		
 	}
 	

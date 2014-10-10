@@ -12,7 +12,7 @@ import java.util.Date;
 public class Messung
 {
 	private Date zp;
-	private double[] wert;
+	private double[] wert = {0,0};
 	private enum messArt {blutDruck, gewicht, blutZucker};
 	
 	public Messung()
@@ -37,7 +37,19 @@ public class Messung
 		this();
 		this.zp = date;
 		this.wert[0] = value1;
+		this.wert[1] = 0;
 		
 	}
+	
+	public Date getDate()
+	{
+		return zp;
+	}
+	
+	public double[] getValues()
+	{
+		return wert;
+	}
+	
 	
 }
