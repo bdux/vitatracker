@@ -76,7 +76,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private void initializeComponents()
 	{
 		
-		iconURL = getClass().getResource("120px-Flat_UI_-_clipboard.png");
+		iconURL = getClass().getResource("120px-Health-stub.gif");
 		ImageIcon icon = new ImageIcon(iconURL);
 		this.setIconImage(icon.getImage());
 		this.setTitle("VitaTracker");
