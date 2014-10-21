@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Properties;
+import resource.*;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
