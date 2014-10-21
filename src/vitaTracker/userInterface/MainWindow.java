@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Properties;
+
 import resource.*;
 
 import javax.swing.*;
@@ -31,7 +32,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private JMenuBar 			menuBar;
 	private JMenu 				datei, extras;
 	private JMenuItem 			miLoad, miSave, miExit;
-	private JLabel				bdSys, bdDia, glucoVal, gewichtVal, messZeit;
+	private JLabel				lblVal1, lblVal2, /*glucoVal, gewichtVal*/ messZeit;
 	private JTextField			tfVal1, tfVal2 /*tfGlucoVal, tfGewichtVal*/, tfMessZeit;
 	private JRadioButton		weightUnit;
 	private String[]			strArrmessArten;
@@ -44,6 +45,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private Messung 			m;
 	private LinkedList<Object>	messungen = new LinkedList<Object>();
 	private File				file = new File("user.home");
+	public static final	int DEFAULT_SELECTION = 0;
 	
 	public MainWindow()
 	{
@@ -64,8 +66,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	private void initFrame()
 	{
-		// Heutigen Tag anzeigen, Graph fuer die letzten 24 Stunden zeichnen
-		// alle Felder leer, combobox auf defaultwert
+//		new ItemEvent(cBoxMessArten, ItemEvent.ITEM_STATE_CHANGED,this,ItemEvent.SELECTED);
 		
 	}
 	
@@ -88,9 +89,10 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		
 		cBoxMessArten = new JComboBox<String>(strArrmessArten);
-		cBoxMessArten.setSelectedItem(strArrmessArten[strArrmessArten.length-1]);
+		cBoxMessArten.setSelectedItem(strArrmessArten[DEFAULT_SELECTION]);
 		cBoxMessArten.setBounds(5, 5, 125, 25);
 		cBoxMessArten.addActionListener(this);
+		cBoxMessArten.addItemListener(this);
 		this.add(cBoxMessArten, BorderLayout.NORTH);
 		
 		
@@ -120,13 +122,13 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		btnMessungSpeichern.addActionListener(this);
 		eingabePanel.add(btnMessungSpeichern);
 		
-		bdSys = new JLabel("Systolischer Wert: ");
-		bdSys.setBounds(15, 10, 150, 25);
-		eingabePanel.add(bdSys);
+		lblVal1 = new JLabel("Systolischer Wert");
+		lblVal1.setBounds(15, 10, 150, 25);
+		eingabePanel.add(lblVal1);
 		
-		bdDia = new JLabel("Diastolischer Wert: ");
-		bdDia.setBounds(15, 75, 150, 25);
-		eingabePanel.add(bdDia);
+		lblVal2 = new JLabel("Diastolischer Wert");
+		lblVal2.setBounds(15, 75, 150, 25);
+		eingabePanel.add(lblVal2);
 		
 		btnMessZeitSetzen = new JButton(">");
 		btnMessZeitSetzen.setFont(btnMessZeitSetzen.getFont().deriveFont(Font.PLAIN));
@@ -227,7 +229,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		case 0:
 			try 
 			{		
-				if (tfVal1.getText() != null &&tfVal2.getText() != null)
+				if (tfVal1.getText() != null && tfVal2.getText() != null)
 				{
 					this.m = new Messung(this.getDateMessung(),
 							Double.parseDouble(tfVal1.getText()),
@@ -313,7 +315,31 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	@Override
 	public void itemStateChanged(ItemEvent e) 
 	{
-		// TODO Auto-generated method stub
+		if (cBoxMessArten.getSelectedIndex() == 0)
+		{
+			lblVal1.setText("Systolischer Wert");
+			lblVal2.setText("Diastolischer Wert");
+			lblVal2.setVisible(true);
+			tfVal2.setVisible(true);
+			
+		}
+		
+		if (cBoxMessArten.getSelectedIndex() == 1)
+		{
+			lblVal1.setText("Blutzuckerwert");
+			lblVal2.setVisible(false);
+			tfVal2.setText(null);
+			tfVal2.setVisible(false);
+		}
+		
+		if (cBoxMessArten.getSelectedIndex() == 2)
+		{
+			lblVal1.setText("Gewicht");
+			lblVal2.setVisible(false);
+			tfVal2.setText(null);
+			tfVal2.setVisible(false);
+		}
+			
 		
 	}
 
