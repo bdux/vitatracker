@@ -1,0 +1,43 @@
+VitaTracker - Benjamin Dux
+
+Als Abschlussprojekt soll eine Software in Java programmiert werden. Diese - im Folgenden VitaTracker genannt - 
+soll folgende Funktionen erhalten:
+
+1. Eingeben von Vitalwerten über eine Eingabemaske
+1.1 Arten von Vitalwerten
+Die vom VitaTracker erfassbaren Vitaldaten sollen folgende sein:
+ - Gewicht: von 0Kg bis 300Kg
+	(optionale Umrechnung in lbs)
+ - Blutdruck (Systolischer Wert und Diastolischer Wertm, in 0-300 mmHg)
+ - Blutzucker (in 0 - 300 mg/dL)
+	(optionale Umrechnung in mmol/L)
+	
+	
+Zu allen Vitalwerten soll ein Datumsstempel in der SQL-gängingen Formatierung abzulegen sein. Die Standardvoreinstellung ist die Aktuelle Systemzeit.
+
+1.2 Abspeichern dieser Werte
+Je nach Ausbaustufe sollen die Werte in einer MySQL oder SQLite Datenbank abgespeichert werden.
+
+
+
+
+	
+2. Ausgabe der Vitalwerte
+2.1 Ausgabe in Tabellenform
+Der VitaTracker soll in der Lage sein, die in der Datendatei/Datenbank abgelegten Werte in tabellarischer Form anzuzeigen. 
+Die Anzeige soll sortierbar nach Datum und Werten sein, wobei ein Filter dafür sorgen soll, dass nur gleichartige Werte sortierbar sind (also z.B. nur Gewicht).
+
+2.2 Ausgabe in Grafischer Form
+Optional können Werteverläufe in Form einer Grafik ausgegeben werden.
+Die in der Grafik auswertbaren Werte sollen sich nach den Filtereinstellungen der Tabelle richten. Wenn also nur Blutdruckwerte in der Tabelle angezeigt werden, sollen in der
+grafischen Darstellung auch nur Blutdruckwerte herangezogen werden. Analog verhält es sich mit den anzuzeigenden Zeiträumen.
+
+Im Filter vorauswählbar sollen folgende Zeiträume sein:
+- Heute (die letzten 24 Stunden)
+- die letzten 2 Tage (die letzten 48 Stunden)
+- letzte Woche (die letzten 7 tage)
+- letzter Monat (die letzten 30 Tage)
+
+
+
+
