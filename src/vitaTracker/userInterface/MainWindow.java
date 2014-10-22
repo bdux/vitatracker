@@ -45,7 +45,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private Messung 			m;
 	private LinkedList<Object>	messungen = new LinkedList<Object>();
 	private File				file = new File("user.home");
-	public static final	int DEFAULT_SELECTION = 0;
+	public static final	int BLUTDRUCK = 0, BLUTZUCKER = 1, GEWICHT = 2;
+	public static final	int DEFAULT_SELECTION = BLUTDRUCK;
 	
 	public MainWindow()
 	{
@@ -197,6 +198,99 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 
 
+	public void erzeugeMessung()
+	{
+		
+		switch (cBoxMessArten.getSelectedIndex()) 
+		{
+		
+		case BLUTDRUCK:
+			try 
+			{		
+				if (tfVal1.getText() != null && tfVal2.getText() != null)
+				{
+					this.m = new Messung(this.getDateMessung(),
+							Double.parseDouble(tfVal1.getText()),
+							Double.parseDouble(tfVal2.getText()),
+							Messung.messArt.blutDruck);
+							
+					break;
+				}	
+				
+			} catch (Exception e) {
+				System.out.println("geht nicht!");
+			}
+		break;
+					
+		case BLUTZUCKER:
+			
+			try 
+			{		
+				if (tfVal1.getText() != null )
+				{
+					this.m = new Messung(this.getDateMessung(),
+							Double.parseDouble(tfVal1.getText()),
+							0,
+							Messung.messArt.blutZucker);
+					break;
+				}	
+				
+			} catch (Exception e) {
+				System.out.println("geht nicht!");
+			}
+		break;
+		
+		case GEWICHT:
+			
+			try 
+			{		
+				if (tfVal1.getText() != null )
+				{
+					this.m = new Messung(this.getDateMessung(),
+							Double.parseDouble(tfVal1.getText()),
+							0,
+							Messung.messArt.gewicht);
+					break;
+				}	
+				
+			} catch (Exception e) {
+				System.out.println("geht nicht!");
+			}
+		break;
+			
+		}
+		
+		messungen.add(m);
+		
+	}
+
+
+	public Object getMessung(int index)
+	{
+		return messungen.get(index);
+	}
+
+
+	public void setMessungen(LinkedList<Object> messungen)
+	{
+		this.messungen = messungen;
+	}
+
+
+	public Date getDateMessung()
+	{
+				
+		return dateMessung;
+	}
+
+
+	public void setDateMessung(Date dateMessung)
+	{
+		this.dateMessung = dateMessung;
+		tfMessZeit.setText(sDForm.format(dateMessung).toString());
+	}
+
+
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
@@ -219,66 +313,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		else if (o == miLoad)
 			dateiLesen();
 	}
-
-	public void erzeugeMessung()
-	{
-		
-		switch (cBoxMessArten.getSelectedIndex()) 
-		{
-		
-		case 0:
-			try 
-			{		
-				if (tfVal1.getText() != null && tfVal2.getText() != null)
-				{
-					this.m = new Messung(this.getDateMessung(),
-							Double.parseDouble(tfVal1.getText()),
-							Double.parseDouble(tfVal2.getText())
-							);
-					break;
-				}	
-				
-			} catch (Exception e) {
-				System.out.println("geht nicht!");
-			}
-		break;
-					
-		default:
-			
-			try 
-			{		
-				if (tfVal1.getText() != null )
-				{
-					this.m = new Messung(this.getDateMessung(),
-							Double.parseDouble(tfVal1.getText())
-							);
-					break;
-				}	
-				
-			} catch (Exception e) {
-				System.out.println("geht nicht!");
-			}
-		break;
-			
-		}
-		
-		messungen.add(m);
-		
-	}
-	
-	public Date getDateMessung()
-	{
-				
-		return dateMessung;
-	}
-
-
-	public void setDateMessung(Date dateMessung)
-	{
-		this.dateMessung = dateMessung;
-		tfMessZeit.setText(sDForm.format(dateMessung).toString());
-	}
-
 
 	@Override
 	public void windowActivated(WindowEvent e){}
