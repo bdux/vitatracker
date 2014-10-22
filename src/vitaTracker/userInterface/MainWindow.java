@@ -43,7 +43,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private URL 				iconURL;
 	private DateTimePicker 		dtp;
 	private Messung 			m;
-	private LinkedList<Object>	messungen = new LinkedList<Object>();
+	private LinkedList<Messung>	messungen = new LinkedList<Messung>();
 	private File				file = new File("user.home");
 	public static final	int BLUTDRUCK = 0, BLUTZUCKER = 1, GEWICHT = 2;
 	public static final	int DEFAULT_SELECTION = BLUTDRUCK;
@@ -213,7 +213,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 							Double.parseDouble(tfVal1.getText()),
 							Double.parseDouble(tfVal2.getText()),
 							Messung.messArt.blutDruck);
-							
+					
+					tfVal1.setText("");
+					tfVal2.setText("");
 					break;
 				}	
 				
@@ -232,6 +234,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 							Double.parseDouble(tfVal1.getText()),
 							0,
 							Messung.messArt.blutZucker);
+					tfVal1.setText("");
 					break;
 				}	
 				
@@ -250,6 +253,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 							Double.parseDouble(tfVal1.getText()),
 							0,
 							Messung.messArt.gewicht);
+					tfVal1.setText("");
 					break;
 				}	
 				
@@ -265,13 +269,10 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 
 
-	public Object getMessung(int index)
-	{
-		return messungen.get(index);
-	}
+	
 
 
-	public void setMessungen(LinkedList<Object> messungen)
+	public void setMessungen(LinkedList<Messung> messungen)
 	{
 		this.messungen = messungen;
 	}
@@ -349,7 +350,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	@Override
 	public void itemStateChanged(ItemEvent e) 
 	{
-		if (cBoxMessArten.getSelectedIndex() == 0)
+		if (cBoxMessArten.getSelectedIndex() == BLUTDRUCK)
 		{
 			lblVal1.setText("Systolischer Wert");
 			lblVal2.setText("Diastolischer Wert");
@@ -358,7 +359,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			
 		}
 		
-		if (cBoxMessArten.getSelectedIndex() == 1)
+		if (cBoxMessArten.getSelectedIndex() == BLUTZUCKER)
 		{
 			lblVal1.setText("Blutzuckerwert");
 			lblVal2.setVisible(false);
@@ -366,7 +367,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			tfVal2.setVisible(false);
 		}
 		
-		if (cBoxMessArten.getSelectedIndex() == 2)
+		if (cBoxMessArten.getSelectedIndex() == GEWICHT)
 		{
 			lblVal1.setText("Gewicht");
 			lblVal2.setVisible(false);
