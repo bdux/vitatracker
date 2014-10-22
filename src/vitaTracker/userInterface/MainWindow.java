@@ -174,7 +174,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		fc.setFileFilter(new FileNameExtensionFilter("Textdateien (*.txt)", "txt"));
 		fc.setAcceptAllFileFilterUsed(false);
-		fc.setDialogTitle("Textdatei Ausw‰hlen");
+		fc.setDialogTitle("Textdatei Ausw√§hlen");
 		
 		
 		fc.setCurrentDirectory(file);
