@@ -45,6 +45,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private Messung 			m;
 	private LinkedList<Messung>	messungen = new LinkedList<Messung>();
 	private File				file = new File("user.home");
+	
 	public static final	int BLUTDRUCK = 0, BLUTZUCKER = 1, GEWICHT = 2;
 	public static final	int DEFAULT_SELECTION = BLUTDRUCK;
 	
@@ -159,13 +160,13 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 	}
 		
-	private void checkSelection()
-	{
-		
-			System.out.println("die Auswahl ist: " + cBoxMessArten.getSelectedItem().toString());
-			System.out.println(cBoxMessArten.getSelectedIndex() + " index");
-	}
-	
+//	private void checkSelection()
+//	{
+//		
+//			System.out.println("die Auswahl ist: " + cBoxMessArten.getSelectedItem().toString());
+//			System.out.println(cBoxMessArten.getSelectedIndex() + " index");
+//	}
+//	
 	private void dateiLesen()
 	{
 		
@@ -297,10 +298,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	{
 		Object o = e.getSource();
 		
-		if (o == cBoxMessArten)
-			checkSelection();
-		
-		else if (o == miExit)
+		if (o == miExit)
 			this.dispose();
 		else if (o == btnMessZeitSetzen)
 			dtp = new DateTimePicker(this);
