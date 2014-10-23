@@ -18,7 +18,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import vitaTracker.Util.*;
-import vitaTracker.dataHandler.DBTableModel;
+import vitaTracker.dataHandler.*;
 //import vitaTracker.dataHandler.messungen.MessWert;
 //import vitaTracker.dataHandler.messungen.Messung;
 //import vitaTracker.dataHandler.messungen.Messung.messArtEnum;
@@ -38,6 +38,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private JLabel				lblVal1, lblVal2, /*glucoVal, gewichtVal*/ messZeit, lblUnit;
 	private JTextField			tfVal1, tfVal2 /*tfGlucoVal, tfGewichtVal*/, tfMessZeit;
 	private JTable				messungTabelle;
+	private WindowTableModel	wTableModel;
 	private String[]			strArrmessArten, strMessUnits, tableColumnNames;
 	private Date				dateMessung;
 	private Calendar			calDateMess;
@@ -47,10 +48,11 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private DateTimePicker 		dtp;
 	private Messung 			m;
 	private LinkedList<Messung> messungen = new LinkedList<Messung>();
-	private Object[][]			objArrTable = new Object[5][4];
+	private Object[][]			objArrTable;
 	private File				file = new File("user.home");
 	private StatusBar			statusBar;
 	private BorderLayout		FrameLayout, ePBl, hPBl;
+	private boolean messWasCreated = false;
 	private enum messArtEnum {blutDruck, gewicht, blutZucker};
 	
 	// Diverse Parameter Ints 
@@ -107,7 +109,10 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 
 		
 		tableColumnNames = new String[] {"Messungsart", "Wert", "Einheit", "Messzeitpunkt"};
-		messungTabelle = new JTable(objArrTable, tableColumnNames);
+//		messungTabelle = new JTable(objArrTable, tableColumnNames);
+		objArrTable = new Object[messungen.size()][4];
+		wTableModel = new WindowTableModel(objArrTable);
+		messungTabelle = new JTable(wTableModel);
 		
 		JScrollPane tableScroll = new JScrollPane(messungTabelle);
 		this.add(tableScroll, FrameLayout.CENTER);
@@ -299,23 +304,32 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 
 	private void addTableEntry(int row)
 	{
-		if (row<=objArrTable.length)
+				
+		if (messWasCreated)
 		{
-			objArrTable[row][0] = messungen.get(row).getStrMessArt();
-			objArrTable[row][1] = messungen.get(row).getValues(0);
-			objArrTable[row][2] = strMessUnits[cBoxMsngUnit.getSelectedIndex()];
-			objArrTable[row][3] = messungen.get(row).getDate();
-			messungTabelle.repaint();
+			if (row<=objArrTable.length && row >-1)
+			{
+				objArrTable[row][0] = messungen.get(row).getStrMessArt();
+				
+				if (cBoxMessArten.getSelectedIndex() == BLUTDRUCK)
+				{	objArrTable[row][1] = messungen.get(row).getValueAtIndex(0) + " / " + messungen.get(row).getValueAtIndex(1);
+				} else	{	objArrTable[row][1] = messungen.get(row).getValueAtIndex(0); }
+				
+				objArrTable[row][2] = cBoxMsngUnit.getSelectedItem().toString();
+				objArrTable[row][3] = sDForm.format(messungen.get(row).getDate());
+				
+				messungTabelle.repaint();
+			}
+	//		else
+	//		{
+	//			Object[][] temp = objArrTable.clone();
+	//			objArrTable = new Object[temp.length+10][4];
+	//			System.arraycopy(temp, 0, objArrTable, 0, temp.length);
+	//			temp = null;			
+	//			
+	//		}
+//		
 		}
-		else
-		{
-			Object[][] temp = objArrTable.clone();
-			objArrTable = new Object[temp.length+10][4];
-			System.arraycopy(temp, 0, objArrTable, 0, temp.length);
-			temp = null;			
-			
-		}
-		
 	}
 
 
@@ -335,16 +349,24 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 							Double.parseDouble(tfVal2.getText()),
 							messArtEnum.blutDruck);
 					
+					
 					tfVal1.setText("");
 					tfVal2.setText("");
-					break;
+					messWasCreated = true;
+					
 				}	
 				
 			} catch (Exception e) {
 				System.out.println("geht nicht!");
+				JOptionPane.showMessageDialog(this, "Falsche Eingabe: Eines der Felder ist leer.", "Fehler", JOptionPane.OK_OPTION, null);
+				messWasCreated = false;
+				
 			}
+		
 		break;
-					
+		
+		
+		
 		case BLUTZUCKER:
 			
 			try 
@@ -356,12 +378,16 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 							0,
 							messArtEnum.blutZucker);
 					tfVal1.setText("");
-					break;
+					messWasCreated = true;
+					
 				}	
 				
 			} catch (Exception e) {
 				System.out.println("geht nicht!");
+				messWasCreated = false;
+				
 			}
+			
 		break;
 		
 		case GEWICHT:
@@ -375,17 +401,26 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 							0,
 							messArtEnum.gewicht);
 					tfVal1.setText("");
-					break;
+					messWasCreated = true;
+					
 				}	
 				
 			} catch (Exception e) {
 				System.out.println("geht nicht!");
+				messWasCreated = false;
+				
 			}
 		break;
 			
 		}
 		
 		addMessung(m);
+		if (messWasCreated)
+		{	
+			addTableEntry(messungen.size()-1);
+			messWasCreated = false;		
+		}
+		
 		
 	}
 
@@ -438,11 +473,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			dtp = new DateTimePicker(this);
 		else if (o == btnMessungSpeichern)
 		{ 
-			System.out.println(tfVal1.getText());
-			System.out.println(tfVal2.getText());
-			erzeugeMessung();
-			addTableEntry(messungen.size()-1);
-//			System.out.println(m);
+			erzeugeMessung();		
 		}
 		else if (o == miLoad)
 			dateiLesen();
@@ -565,9 +596,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 				return zp;
 			}
 			
-			public double getValues(int val1)
+			public double getValueAtIndex(int val)
 			{
-				return wert[val1];
+				return wert[val];
 			}
 			
 			public String getStrMessArt()
@@ -576,7 +607,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 				return messArtStr;
 				
 			}
-			
+
+		
 			
 		}
 
