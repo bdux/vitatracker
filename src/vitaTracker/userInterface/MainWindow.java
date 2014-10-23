@@ -12,12 +12,16 @@ import java.util.Properties;
 
 import resource.*;
 
+import javax.activation.DataHandler;
+import javax.jws.Oneway;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import vitaTracker.Util.*;
+import vitaTracker.dataHandler.DBTableModel;
 //import vitaTracker.dataHandler.messungen.MessWert;
-import vitaTracker.dataHandler.messungen.Messung;
+//import vitaTracker.dataHandler.messungen.Messung;
+//import vitaTracker.dataHandler.messungen.Messung.messArtEnum;
 /**
  * 
  * @author Benjamin Dux
@@ -33,8 +37,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private JMenuItem 			miLoad, miSave, miExit;
 	private JLabel				lblVal1, lblVal2, /*glucoVal, gewichtVal*/ messZeit, lblUnit;
 	private JTextField			tfVal1, tfVal2 /*tfGlucoVal, tfGewichtVal*/, tfMessZeit;
-	private JRadioButton		weightUnit;
-	private String[]			strArrmessArten, strMessUnits;
+	private JTable				messungTabelle;
+	private String[]			strArrmessArten, strMessUnits, tableColumnNames;
 	private Date				dateMessung;
 	private Calendar			calDateMess;
 	private SimpleDateFormat	sDForm;
@@ -42,11 +46,12 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private URL 				iconURL;
 	private DateTimePicker 		dtp;
 	private Messung 			m;
-	private LinkedList<Messung>	messungen = new LinkedList<Messung>();
+	private LinkedList<Messung> messungen = new LinkedList<Messung>();
+	private Object[][]			objArrTable = new Object[5][4];
 	private File				file = new File("user.home");
 	private StatusBar			statusBar;
 	private BorderLayout		FrameLayout, ePBl, hPBl;
-	
+	private enum messArtEnum {blutDruck, gewicht, blutZucker};
 	
 	// Diverse Parameter Ints 
 	public static final	int BLUTDRUCK = 0, BLUTZUCKER = 1, GEWICHT = 2,
@@ -100,6 +105,12 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		this.setIconImage(icon.getImage());
 		this.setTitle("VitaTracker");
 
+		
+		tableColumnNames = new String[] {"Messungsart", "Wert", "Einheit", "Messzeitpunkt"};
+		messungTabelle = new JTable(objArrTable, tableColumnNames);
+		JScrollPane tableScroll = new JScrollPane(messungTabelle);
+		this.add(tableScroll, FrameLayout.CENTER);
+		
 		strArrmessArten = new String[] {"Blutdruck","Blutzucker","Gewicht"};
 		strMessUnits = new String[] {"mmHg","Kg","lbs","mmol/L","mg/dL"};
 		dateMessung = new Date(System.currentTimeMillis());
@@ -282,6 +293,28 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 
 
+	private void addTableEntry(int row)
+	{
+		if (row<=objArrTable.length)
+		{
+			objArrTable[row][0] = messungen.get(row).getStrMessArt();
+			objArrTable[row][1] = messungen.get(row).getValues(0);
+			objArrTable[row][2] = strMessUnits[cBoxMsngUnit.getSelectedIndex()];
+			objArrTable[row][3] = messungen.get(row).getDate();
+			messungTabelle.repaint();
+		}
+		else
+		{
+			Object[][] temp = objArrTable.clone();
+			objArrTable = new Object[temp.length+10][4];
+			System.arraycopy(temp, 0, objArrTable, 0, temp.length);
+			temp = null;			
+			
+		}
+		
+	}
+
+
 	public void erzeugeMessung()
 	{
 		
@@ -296,7 +329,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 					this.m = new Messung(this.getDateMessung(),
 							Double.parseDouble(tfVal1.getText()),
 							Double.parseDouble(tfVal2.getText()),
-							Messung.messArt.blutDruck);
+							messArtEnum.blutDruck);
 					
 					tfVal1.setText("");
 					tfVal2.setText("");
@@ -317,7 +350,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 					this.m = new Messung(this.getDateMessung(),
 							Double.parseDouble(tfVal1.getText()),
 							0,
-							Messung.messArt.blutZucker);
+							messArtEnum.blutZucker);
 					tfVal1.setText("");
 					break;
 				}	
@@ -336,7 +369,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 					this.m = new Messung(this.getDateMessung(),
 							Double.parseDouble(tfVal1.getText()),
 							0,
-							Messung.messArt.gewicht);
+							messArtEnum.gewicht);
 					tfVal1.setText("");
 					break;
 				}	
@@ -348,7 +381,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			
 		}
 		
-		messungen.add(m);
+		addMessung(m);
 		
 	}
 
@@ -356,9 +389,23 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 
 
-	public void setMessungen(LinkedList<Messung> messungen)
+	private void addMessung(Messung m)
 	{
-		this.messungen = messungen;
+		if (m != null)
+		{
+			messungen.add(m);
+			
+		}
+		
+	}
+
+
+	
+
+
+	public void setMessungen(Messung messungen)
+	{
+	
 	}
 
 
@@ -374,8 +421,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		this.dateMessung = dateMessung;
 		tfMessZeit.setText(sDForm.format(dateMessung).toString());
 	}
-
-
+	
+	
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
@@ -390,6 +437,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			System.out.println(tfVal1.getText());
 			System.out.println(tfVal2.getText());
 			erzeugeMessung();
+			addTableEntry(messungen.size()-1);
 //			System.out.println(m);
 		}
 		else if (o == miLoad)
@@ -440,6 +488,93 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		}	
 		
 	}
+
+
+	private static class Messung
+		{
+			private Date zp;
+			private double[] wert = {0,0};
+			private String messArtStr = null;
+			
+			public Messung()
+			{
+				
+				this.zp = new Date(System.currentTimeMillis());
+	//			this.wert[0] = 0.0;
+				
+			}
+			
+			public Messung (Date date, double value1, double value2)
+			{
+				this();
+				this.zp = date;
+				this.wert[0] = value1;
+				this.wert[1] = value2;
+				
+			}
+			
+			public Messung (Date date, double value1)
+			{
+				this();
+				this.zp = date;
+				this.wert[0] = value1;
+				this.wert[1] = 0;
+				
+			}
+			
+			public Messung (Date date, double value1, double value2, messArtEnum art)
+			{
+				this();
+				if (art == messArtEnum.blutDruck)
+				{
+				this.zp = date;
+				this.wert[0] = value1;
+				this.wert[1] = value2;
+				this.messArtStr = "Blutdruck";
+				}
+				
+				if (art == messArtEnum.blutZucker)
+				{
+				this.zp = date;
+				this.wert[0] = value1;
+				this.wert[1] = 0;
+				this.messArtStr = "Glucose";
+				}
+				
+				
+				if (art == messArtEnum.gewicht)
+				{
+				this.zp = date;
+				this.wert[0] = value1;
+				this.wert[1] = 0;
+				this.messArtStr = "Gewicht";
+				}
+				
+				
+				
+				
+				
+			}
+			
+			public Date getDate()
+			{
+				return zp;
+			}
+			
+			public double getValues(int val1)
+			{
+				return wert[val1];
+			}
+			
+			public String getStrMessArt()
+			{
+				
+				return messArtStr;
+				
+			}
+			
+			
+		}
 
 
 	public static void main(String[] args)

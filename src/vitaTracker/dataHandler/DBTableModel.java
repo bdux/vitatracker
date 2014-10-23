@@ -11,14 +11,14 @@ import vitaTracker.Util.DBConnection;
 
 
 
-public class MyTableModel extends AbstractTableModel
+public class DBTableModel extends AbstractTableModel
 {
 	
 	private int anzahlSpalten, anzahlZeilen;
 	private ArrayList<String> ColumnNames;
 	private Object[][] data;
 	
-	public MyTableModel(String sql)
+	public DBTableModel(String sql)
 	{
 		ResultSet rSet = DBConnection.executeQuery(sql);
 		

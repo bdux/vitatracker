@@ -13,7 +13,8 @@ public class Messung
 {
 	private Date zp;
 	private double[] wert = {0,0};
-	public static enum messArt {blutDruck, gewicht, blutZucker};
+	public static enum messArtEnum {blutDruck, gewicht, blutZucker};
+	private String messArtStr = null;
 	
 	public Messung()
 	{
@@ -41,29 +42,32 @@ public class Messung
 		
 	}
 	
-	public Messung (Date date, double value1, double value2, messArt art)
+	public Messung (Date date, double value1, double value2, messArtEnum art)
 	{
 		this();
-		if (art == messArt.blutDruck)
+		if (art == messArtEnum.blutDruck)
 		{
 		this.zp = date;
 		this.wert[0] = value1;
 		this.wert[1] = value2;
+		this.messArtStr = "Blutdruck";
 		}
 		
-		if (art == messArt.blutZucker)
+		if (art == messArtEnum.blutZucker)
 		{
 		this.zp = date;
 		this.wert[0] = value1;
 		this.wert[1] = 0;
+		this.messArtStr = "Glucose";
 		}
 		
 		
-		if (art == messArt.gewicht)
+		if (art == messArtEnum.gewicht)
 		{
 		this.zp = date;
 		this.wert[0] = value1;
 		this.wert[1] = 0;
+		this.messArtStr = "Gewicht";
 		}
 		
 		
@@ -77,9 +81,16 @@ public class Messung
 		return zp;
 	}
 	
-	public double[] getValues()
+	public double getValues(int val1)
 	{
-		return wert;
+		return wert[val1];
+	}
+	
+	public String getStrMessArt()
+	{
+		
+		return messArtStr;
+		
 	}
 	
 	
