@@ -26,28 +26,30 @@ import vitaTracker.dataHandler.messungen.Messung;
 public class MainWindow extends JFrame implements ActionListener, WindowListener, ItemListener
 {
 
-	private JPanel 				chartPanel, eingabePanel, tfPanel;
+	private JPanel 				chartPanel, eingabePanel, tfPanel, headPanel;
 	private JButton				btnMessungSpeichern, btnFelderLoeschen, btnDatenHolen,btnMessZeitSetzen;
-	private JComboBox<String>	msngArt;
+//	private JComboBox<String>	msngArt, cbMsngUnit;
 	private JMenuBar 			menuBar;
 	private JMenu 				datei, extras;
 	private JMenuItem 			miLoad, miSave, miExit;
-	private JLabel				lblVal1, lblVal2, /*glucoVal, gewichtVal*/ messZeit;
+	private JLabel				lblVal1, lblVal2, /*glucoVal, gewichtVal*/ messZeit, lblUnit;
 	private JTextField			tfVal1, tfVal2 /*tfGlucoVal, tfGewichtVal*/, tfMessZeit;
 	private JRadioButton		weightUnit;
-	private String[]			strArrmessArten;
+	private String[]			strArrmessArten, strMessUnits;
 	private Date				dateMessung;
 	private Calendar			calDateMess;
 	private SimpleDateFormat	sDForm;
-	private JComboBox<String> 	cBoxMessArten;
+	private JComboBox<String> 	cBoxMessArten,cBoxMsngUnit;
 	private URL 				iconURL;
 	private DateTimePicker 		dtp;
 	private Messung 			m;
 	private LinkedList<Messung>	messungen = new LinkedList<Messung>();
 	private File				file = new File("user.home");
 	
-	public static final	int BLUTDRUCK = 0, BLUTZUCKER = 1, GEWICHT = 2;
-	public static final	int DEFAULT_SELECTION = BLUTDRUCK;
+	// Diverse Parameter Ints 
+	public static final	int BLUTDRUCK = 0, BLUTZUCKER = 1, GEWICHT = 2,
+							DEFAULT_SELECTION = BLUTDRUCK, BP_UNIT = 0, WEIGHT_METRIC = 1, 
+							WEIGHT_IMPERIAL = 2, GLUCO_MOL = 3, GLUCO_MG = 4;
 	
 	public MainWindow()
 	{
@@ -85,24 +87,43 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		this.setIconImage(icon.getImage());
 		this.setTitle("VitaTracker");
 		strArrmessArten = new String[] {"Blutdruck","Blutzucker","Gewicht"};
+		strMessUnits = new String[] {"mmHg","Kg","lbs","mmol/L","mg/dL"};
 		dateMessung = new Date(System.currentTimeMillis());
 		sDForm = new SimpleDateFormat("dd.MM.yyyy, HH:mm:ss");
-		
-		
-		
-		cBoxMessArten = new JComboBox<String>(strArrmessArten);
-		cBoxMessArten.setSelectedItem(strArrmessArten[DEFAULT_SELECTION]);
-		cBoxMessArten.setBounds(5, 5, 125, 25);
-		cBoxMessArten.addActionListener(this);
-		cBoxMessArten.addItemListener(this);
-		this.add(cBoxMessArten, BorderLayout.NORTH);
-		
 		
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.setLayout(new BorderLayout());
 		this.setBounds(100, 100, 640, 480);
 		this.addWindowListener(this);
-		this.setResizable(false);
+		this.setResizable(true);
+		
+		headPanel = new JPanel();
+		headPanel.setBackground(Color.LIGHT_GRAY);
+		headPanel.setLayout(new BorderLayout());
+		this.add(headPanel, BorderLayout.PAGE_START);
+		
+		cBoxMessArten = new JComboBox<String>(strArrmessArten);
+		cBoxMessArten.setSelectedItem(strArrmessArten[DEFAULT_SELECTION]);
+//		cBoxMessArten.setBounds(5, 5, 125, 25);
+//		cBoxMessArten.addActionListener(this);
+		cBoxMessArten.setPreferredSize(new Dimension(200,25));
+		
+		cBoxMsngUnit = new JComboBox<String>();
+		cBoxMsngUnit.addItemListener(this);
+		cBoxMsngUnit.addItem(strMessUnits[cBoxMessArten.getSelectedIndex()]);
+		cBoxMsngUnit.setPreferredSize(new Dimension(100,25));
+		headPanel.add(cBoxMsngUnit, BorderLayout.LINE_END);
+		
+		
+		
+		cBoxMessArten.addItemListener(this);
+		headPanel.add(cBoxMessArten, BorderLayout.LINE_START);
+		
+		lblUnit = new JLabel("Einheit: ");
+		lblUnit.setPreferredSize(new Dimension(200, 25));
+		headPanel.add(lblUnit, BorderLayout.CENTER);
+		
+		
 
 		menuBar = new JMenuBar();
 		datei = WinUtil.createMenu(menuBar, "Datei", "menuName", 'D');
@@ -113,50 +134,85 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		this.setJMenuBar(menuBar);
 		
 		eingabePanel = new JPanel();
-		eingabePanel.setLayout(null);
+		eingabePanel.setLayout(new BorderLayout());
 		eingabePanel.setPreferredSize(new Dimension(200,250));
 		eingabePanel.setBackground(Color.LIGHT_GRAY);
-		this.add(eingabePanel, BorderLayout.EAST);
+		this.add(eingabePanel, BorderLayout.LINE_START);
+		
 		
 		
 		btnMessungSpeichern = new JButton("Messung Speichern");
 		btnMessungSpeichern.setBounds(15, 400, 150, 25);
 		btnMessungSpeichern.addActionListener(this);
-		eingabePanel.add(btnMessungSpeichern);
+		eingabePanel.add(btnMessungSpeichern, BorderLayout.PAGE_END);
 		
 		lblVal1 = new JLabel("Systolischer Wert");
-		lblVal1.setBounds(15, 10, 150, 25);
+		lblVal1.setBounds(15, 30, 150, 25);
 		eingabePanel.add(lblVal1);
 		
 		lblVal2 = new JLabel("Diastolischer Wert");
-		lblVal2.setBounds(15, 75, 150, 25);
-		eingabePanel.add(lblVal2);
+		lblVal2.setBounds(15, 95, 150, 25);
+		eingabePanel.add(lblVal2, BorderLayout.CENTER);
 		
 		btnMessZeitSetzen = new JButton(">");
 		btnMessZeitSetzen.setFont(btnMessZeitSetzen.getFont().deriveFont(Font.PLAIN));
 		btnMessZeitSetzen.setMargin(null);
-		btnMessZeitSetzen.setBounds(170, 160 ,25,25);
+		btnMessZeitSetzen.setBounds(170, 180 ,25,25);
 		btnMessZeitSetzen.addActionListener(this);
-		eingabePanel.add(btnMessZeitSetzen);
+		eingabePanel.add(btnMessZeitSetzen, BorderLayout.CENTER);
 		
 		messZeit = new JLabel("Messzeitpunkt: ");
-		messZeit.setBounds(15, 130, 150, 25);
-		eingabePanel.add(messZeit);
+		messZeit.setBounds(15, 150, 150, 25);
+		eingabePanel.add(messZeit, BorderLayout.CENTER);
 		
 		
 		tfMessZeit = new JTextField(sDForm.format(dateMessung).toString());
-		tfMessZeit.setBounds(15, 160, 150, 25);
+		tfMessZeit.setBounds(15, 180, 150, 25);
 		tfMessZeit.setEnabled(false);
-		eingabePanel.add(tfMessZeit);
+		eingabePanel.add(tfMessZeit, BorderLayout.CENTER);
 		
 		
 		tfVal1 = new JTextField();
-		tfVal1.setBounds(15,35,75,25);
-		eingabePanel.add(tfVal1);
+		tfVal1.setBounds(15,55,75,25);
+		eingabePanel.add(tfVal1, BorderLayout.CENTER);
 		
 		tfVal2 = new JTextField();
-		tfVal2.setBounds(15,100,75,25);
-		eingabePanel.add(tfVal2);
+		tfVal2.setBounds(15,120,75,25);
+		eingabePanel.add(tfVal2, BorderLayout.CENTER);
+		
+		this.pack();
+		
+	}
+	
+	private void setUnitEntries(int messung)
+	{
+		cBoxMsngUnit.removeAllItems();
+		switch (messung)
+		{
+		case BLUTDRUCK:
+			
+			cBoxMsngUnit.addItem(strMessUnits[BP_UNIT]);
+			
+			break;
+
+		case BLUTZUCKER:
+			
+			cBoxMsngUnit.addItem(strMessUnits[GLUCO_MG]);
+			cBoxMsngUnit.addItem(strMessUnits[GLUCO_MOL]);
+			
+			break;
+			
+		case GEWICHT:
+			
+			cBoxMsngUnit.addItem(strMessUnits[WEIGHT_METRIC]);
+			cBoxMsngUnit.addItem(strMessUnits[WEIGHT_IMPERIAL]);
+			
+			
+			break;
+			
+		default:
+			break;
+		}
 		
 	}
 		
@@ -348,31 +404,38 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	@Override
 	public void itemStateChanged(ItemEvent e) 
 	{
-		if (cBoxMessArten.getSelectedIndex() == BLUTDRUCK)
-		{
-			lblVal1.setText("Systolischer Wert");
-			lblVal2.setText("Diastolischer Wert");
-			lblVal2.setVisible(true);
-			tfVal2.setVisible(true);
-			
-		}
+		Object o = e.getSource();
 		
-		if (cBoxMessArten.getSelectedIndex() == BLUTZUCKER)
+		if(o == cBoxMessArten)
 		{
-			lblVal1.setText("Blutzuckerwert");
-			lblVal2.setVisible(false);
-			tfVal2.setText(null);
-			tfVal2.setVisible(false);
-		}
-		
-		if (cBoxMessArten.getSelectedIndex() == GEWICHT)
-		{
-			lblVal1.setText("Gewicht");
-			lblVal2.setVisible(false);
-			tfVal2.setText(null);
-			tfVal2.setVisible(false);
-		}
 			
+			if (cBoxMessArten.getSelectedIndex() == BLUTDRUCK)
+			{
+				lblVal1.setText("Systolischer Wert");
+				lblVal2.setText("Diastolischer Wert");
+				lblVal2.setVisible(true);
+				tfVal2.setVisible(true);
+				
+			}
+			
+			if (cBoxMessArten.getSelectedIndex() == BLUTZUCKER)
+			{
+				lblVal1.setText("Blutzuckerwert");
+				lblVal2.setVisible(false);
+				tfVal2.setText(null);
+				tfVal2.setVisible(false);
+			}
+			
+			if (cBoxMessArten.getSelectedIndex() == GEWICHT)
+			{
+				lblVal1.setText("Gewicht");
+				lblVal2.setVisible(false);
+				tfVal2.setText(null);
+				tfVal2.setVisible(false);
+			}
+			
+			setUnitEntries(cBoxMessArten.getSelectedIndex());
+		}	
 		
 	}
 
