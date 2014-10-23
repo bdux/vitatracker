@@ -108,6 +108,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		tableColumnNames = new String[] {"Messungsart", "Wert", "Einheit", "Messzeitpunkt"};
 		messungTabelle = new JTable(objArrTable, tableColumnNames);
+		
 		JScrollPane tableScroll = new JScrollPane(messungTabelle);
 		this.add(tableScroll, FrameLayout.CENTER);
 		
@@ -209,6 +210,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	/**
 	 * ändert die Ansicht für das Eingabepanel entsprechend der auswahl der cBoxMessArten
+	 * <br></br>
+	 * @param int messung: Integer Wert zur Übergabe and das Messeinheiten Array 
+	 * 
 	 */
 	private void setUIEntries(int messung)
 	{
