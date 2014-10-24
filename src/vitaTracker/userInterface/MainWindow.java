@@ -109,10 +109,10 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 
 		
 		tableColumnNames = new String[] {"Messungsart", "Wert", "Einheit", "Messzeitpunkt"};
-//		messungTabelle = new JTable(objArrTable, tableColumnNames);
-		objArrTable = new Object[messungen.size()][4];
-		wTableModel = new WindowTableModel(objArrTable);
-		messungTabelle = new JTable(wTableModel);
+		objArrTable = new Object[4][10];
+		messungTabelle = new JTable(objArrTable, tableColumnNames);
+//		wTableModel = new WindowTableModel(objArrTable);
+//		messungTabelle = new JTable(wTableModel);
 		
 		JScrollPane tableScroll = new JScrollPane(messungTabelle);
 		this.add(tableScroll, FrameLayout.CENTER);
@@ -214,9 +214,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	
 	/**
-	 * ändert die Ansicht für das Eingabepanel entsprechend der auswahl der cBoxMessArten
+	 * ï¿½ndert die Ansicht fï¿½r das Eingabepanel entsprechend der auswahl der cBoxMessArten
 	 * <br></br>
-	 * @param int messung: Integer Wert zur Übergabe and das Messeinheiten Array 
+	 * @param int messung: Integer Wert zur ï¿½bergabe and das Messeinheiten Array 
 	 * 
 	 */
 	private void setUIEntries(int messung)
@@ -320,15 +320,15 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 				
 				messungTabelle.repaint();
 			}
-	//		else
-	//		{
-	//			Object[][] temp = objArrTable.clone();
-	//			objArrTable = new Object[temp.length+10][4];
-	//			System.arraycopy(temp, 0, objArrTable, 0, temp.length);
-	//			temp = null;			
-	//			
-	//		}
-//		
+			else
+			{
+				Object[][] temp = objArrTable.clone();
+				objArrTable = new Object[temp.length+10][4];
+				System.arraycopy(temp, 0, objArrTable, 0, temp.length);
+				temp = null;			
+				
+			}
+		
 		}
 	}
 
