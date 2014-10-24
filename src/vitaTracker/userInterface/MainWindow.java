@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.net.URL;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,7 +16,10 @@ import resource.*;
 import javax.activation.DataHandler;
 import javax.jws.Oneway;
 import javax.swing.*;
+import javax.swing.JFormattedTextField.AbstractFormatter;
+import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.MaskFormatter;
 
 import vitaTracker.Util.*;
 import vitaTracker.dataHandler.*;
@@ -37,7 +41,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private JMenu 				datei, extras;
 	private JMenuItem 			miLoad, miSave, miExit;
 	private JLabel				lblVal1, lblVal2, /*glucoVal, gewichtVal*/ messZeit, lblUnit;
-	private JTextField			tfVal1, tfVal2 /*tfGlucoVal, tfGewichtVal*/, tfMessZeit;
+	private JTextField			/*tfVal1, tfVal2 tfGlucoVal, tfGewichtVal*/ tfMessZeit;
+	private JFormattedTextField	tfVal1, tfVal2;
 	private JTable				messungTabelle;
 	private WindowTableModel	wTableModel;
 	private String[]			strArrmessArten, strMessUnits, tableColumnNames;
@@ -54,6 +59,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private StatusBar			statusBar;
 	private BorderLayout		FrameLayout, ePBl, hPBl;
 	private GridLayout			bFPl;
+	
 	private boolean messWasCreated = false;
 //	private enum messArtEnum {blutDruck, gewicht, blutZucker};
 	
@@ -176,7 +182,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		lblVal1.setBounds(15, 20, 150, 25);
 		eingabeInnerPanel.add(lblVal1);
 		
-		tfVal1 = new JTextField();
+		tfVal1 = new JFormattedTextField(createFormatter("###'.##"));
 		tfVal1.setBounds(15, 45, 75, 25);
 		eingabeInnerPanel.add(tfVal1);
 		
@@ -184,7 +190,10 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		lblVal2.setBounds(15, 95, 150, 25);
 		eingabeInnerPanel.add(lblVal2);
 
-		tfVal2 = new JTextField();
+		
+		tfVal2 = new JFormattedTextField(createFormatter("###'.'##"));
+		
+		
 		tfVal2.setBounds(15,120,75,25);
 		eingabeInnerPanel.add(tfVal2);
 		
@@ -629,11 +638,113 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 //		}
 
 
-	public static void main(String[] args)
-	{
-		MainWindow mw = new MainWindow();
-		mw.Show();
 	
-	}
+
+
+	//	private static class Messung
+	//		{
+	//			private Date zp;
+	//			private double[] wert = {0,0};
+	//			private String messArtStr = null;
+	//			
+	//			public Messung()
+	//			{
+	//				
+	//				this.zp = new Date(System.currentTimeMillis());
+	//	//			this.wert[0] = 0.0;
+	//				
+	//			}
+	//			
+	//			public Messung (Date date, double value1, double value2)
+	//			{
+	//				this();
+	//				this.zp = date;
+	//				this.wert[0] = value1;
+	//				this.wert[1] = value2;
+	//				
+	//			}
+	//			
+	//			public Messung (Date date, double value1)
+	//			{
+	//				this();
+	//				this.zp = date;
+	//				this.wert[0] = value1;
+	//				this.wert[1] = 0;
+	//				
+	//			}
+	//			
+	//			public Messung (Date date, double value1, double value2, messArtEnum art)
+	//			{
+	//				this();
+	//				if (art == messArtEnum.blutDruck)
+	//				{
+	//				this.zp = date;
+	//				this.wert[0] = value1;
+	//				this.wert[1] = value2;
+	//				this.messArtStr = "Blutdruck";
+	//				}
+	//				
+	//				if (art == messArtEnum.blutZucker)
+	//				{
+	//				this.zp = date;
+	//				this.wert[0] = value1;
+	//				this.wert[1] = 0;
+	//				this.messArtStr = "Glucose";
+	//				}
+	//				
+	//				
+	//				if (art == messArtEnum.gewicht)
+	//				{
+	//				this.zp = date;
+	//				this.wert[0] = value1;
+	//				this.wert[1] = 0;
+	//				this.messArtStr = "Gewicht";
+	//				}
+	//				
+	//				
+	//				
+	//				
+	//				
+	//			}
+	//			
+	//			public Date getDate()
+	//			{
+	//				return zp;
+	//			}
+	//			
+	//			public double getValueAtIndex(int val)
+	//			{
+	//				return wert[val];
+	//			}
+	//			
+	//			public String getStrMessArt()
+	//			{
+	//				
+	//				return messArtStr;
+	//				
+	//			}
+	//
+	//		
+	//			
+	//		}
+	
+	
+	protected MaskFormatter createFormatter(String s) {
+	    MaskFormatter formatter = null;
+	    try {
+	        formatter = new MaskFormatter(s);
+	    } catch (java.text.ParseException exc) {
+	        System.err.println("formatter is bad: " + exc.getMessage());
+	        System.exit(-1);
+	    }
+	    return formatter;
+	}	
+	
+	public static void main(String[] args)
+		{
+			MainWindow mw = new MainWindow();
+			mw.Show();
+		
+		}
 
 }
