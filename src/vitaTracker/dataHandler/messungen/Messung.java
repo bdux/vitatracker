@@ -2,25 +2,18 @@ package vitaTracker.dataHandler.messungen;
 
 import java.util.Date;
 
-/**
- * 
- * @author ben
- *
- *
- */
-
 public class Messung
 {
 	private Date zp;
 	private double[] wert = {0,0};
-	public static enum messArtEnum {blutDruck, gewicht, blutZucker};
 	private String messArtStr = null;
+	public static enum messArtEnum {blutDruck, gewicht, blutZucker};
 	
 	public Messung()
 	{
 		
 		this.zp = new Date(System.currentTimeMillis());
-//		this.wert[0] = 0.0;
+//			this.wert[0] = 0.0;
 		
 	}
 	
@@ -81,9 +74,9 @@ public class Messung
 		return zp;
 	}
 	
-	public double getValues(int val1)
+	public double getValueAtIndex(int val)
 	{
-		return wert[val1];
+		return wert[val];
 	}
 	
 	public String getStrMessArt()
@@ -92,6 +85,7 @@ public class Messung
 		return messArtStr;
 		
 	}
-	
+
+
 	
 }

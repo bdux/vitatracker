@@ -20,7 +20,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import vitaTracker.Util.*;
 import vitaTracker.dataHandler.*;
 //import vitaTracker.dataHandler.messungen.MessWert;
-//import vitaTracker.dataHandler.messungen.Messung;
+import vitaTracker.dataHandler.messungen.Messung;
+import vitaTracker.dataHandler.messungen.Messung.messArtEnum;
 //import vitaTracker.dataHandler.messungen.Messung.messArtEnum;
 /**
  * 
@@ -30,8 +31,8 @@ import vitaTracker.dataHandler.*;
 public class MainWindow extends JFrame implements ActionListener, WindowListener, ItemListener
 {
 
-	private JPanel 				chartPanel, eingabePanel, eingabeInnerPanel, headPanel;
-	private JButton				btnMessungSpeichern, btnFelderLoeschen, btnDatenHolen,btnMessZeitSetzen;
+	private JPanel 				chartPanel, eingabePanel, eingabeInnerPanel, headPanel,pnlBtnFootPanel;
+	private JButton				btnMessAdd, btnFelderLoeschen, btnDatenHolen,btnMessZeitSetzen, btnMessCommit;
 	private JMenuBar 			menuBar;
 	private JMenu 				datei, extras;
 	private JMenuItem 			miLoad, miSave, miExit;
@@ -52,8 +53,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private File				file = new File("user.home");
 	private StatusBar			statusBar;
 	private BorderLayout		FrameLayout, ePBl, hPBl;
+	private GridLayout			bFPl;
 	private boolean messWasCreated = false;
-	private enum messArtEnum {blutDruck, gewicht, blutZucker};
+//	private enum messArtEnum {blutDruck, gewicht, blutZucker};
 	
 	// Diverse Parameter Ints 
 	public static final	int BLUTDRUCK = 0, BLUTZUCKER = 1, GEWICHT = 2,
@@ -92,9 +94,11 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	{
 		ePBl = new BorderLayout(5, 5);
 		hPBl = new BorderLayout(2, 2);
+		bFPl = new GridLayout(0, 1);
 		FrameLayout = new BorderLayout();
 		
 		this.setBounds(100, 100, 400, 350);
+		this.setLocationRelativeTo(null);
 		this.setLayout(FrameLayout);
 		
 		this.setMinimumSize(new Dimension(400,350));
@@ -135,8 +139,13 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		eingabeInnerPanel = new JPanel();
 		eingabeInnerPanel.setLayout(null);
 		eingabeInnerPanel.setPreferredSize(new Dimension(200,250));
-		eingabeInnerPanel.setBackground(Color.LIGHT_GRAY);
+		eingabeInnerPanel.setBackground(eingabePanel.getBackground());
 		eingabePanel.add(eingabeInnerPanel, ePBl.CENTER);
+		
+		pnlBtnFootPanel = new JPanel();
+		pnlBtnFootPanel.setLayout(bFPl);
+		pnlBtnFootPanel.setBackground(eingabePanel.getBackground());
+		eingabePanel.add(pnlBtnFootPanel, ePBl.PAGE_END);
 		
 		headPanel = new JPanel();
 		headPanel.setBackground(eingabePanel.getBackground());
@@ -195,10 +204,17 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		btnMessZeitSetzen.addActionListener(this);
 		eingabeInnerPanel.add(btnMessZeitSetzen);
 
-		btnMessungSpeichern = new JButton("Messung Speichern");
-		btnMessungSpeichern.setBounds(15, 400, 150, 25);
-		btnMessungSpeichern.addActionListener(this);
-		eingabePanel.add(btnMessungSpeichern, ePBl.PAGE_END);
+		btnMessAdd = new JButton("Messung hinzufügen");
+//		btnMessungAdd.setBounds(15, 400, 150, 25);
+		btnMessAdd.addActionListener(this);
+		btnMessAdd.setEnabled(false);
+		pnlBtnFootPanel.add(btnMessAdd);
+		
+		btnMessCommit = new JButton("Messungen Sichern");
+//		btnMessCommit.setBounds(15, 400, 150, 25);
+		btnMessCommit.addActionListener(this);
+		btnMessCommit.setEnabled(false);
+		pnlBtnFootPanel.add(btnMessCommit);
 		
 		menuBar = new JMenuBar();
 		datei = WinUtil.createMenu(menuBar, "Datei", "menuName", 'D');
@@ -471,7 +487,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			this.dispose();
 		else if (o == btnMessZeitSetzen)
 			dtp = new DateTimePicker(this);
-		else if (o == btnMessungSpeichern)
+		else if (o == btnMessAdd)
 		{ 
 			erzeugeMessung();		
 		}
@@ -525,92 +541,92 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 
 
-	private static class Messung
-		{
-			private Date zp;
-			private double[] wert = {0,0};
-			private String messArtStr = null;
-			
-			public Messung()
-			{
-				
-				this.zp = new Date(System.currentTimeMillis());
-	//			this.wert[0] = 0.0;
-				
-			}
-			
-			public Messung (Date date, double value1, double value2)
-			{
-				this();
-				this.zp = date;
-				this.wert[0] = value1;
-				this.wert[1] = value2;
-				
-			}
-			
-			public Messung (Date date, double value1)
-			{
-				this();
-				this.zp = date;
-				this.wert[0] = value1;
-				this.wert[1] = 0;
-				
-			}
-			
-			public Messung (Date date, double value1, double value2, messArtEnum art)
-			{
-				this();
-				if (art == messArtEnum.blutDruck)
-				{
-				this.zp = date;
-				this.wert[0] = value1;
-				this.wert[1] = value2;
-				this.messArtStr = "Blutdruck";
-				}
-				
-				if (art == messArtEnum.blutZucker)
-				{
-				this.zp = date;
-				this.wert[0] = value1;
-				this.wert[1] = 0;
-				this.messArtStr = "Glucose";
-				}
-				
-				
-				if (art == messArtEnum.gewicht)
-				{
-				this.zp = date;
-				this.wert[0] = value1;
-				this.wert[1] = 0;
-				this.messArtStr = "Gewicht";
-				}
-				
-				
-				
-				
-				
-			}
-			
-			public Date getDate()
-			{
-				return zp;
-			}
-			
-			public double getValueAtIndex(int val)
-			{
-				return wert[val];
-			}
-			
-			public String getStrMessArt()
-			{
-				
-				return messArtStr;
-				
-			}
-
-		
-			
-		}
+//	private static class Messung
+//		{
+//			private Date zp;
+//			private double[] wert = {0,0};
+//			private String messArtStr = null;
+//			
+//			public Messung()
+//			{
+//				
+//				this.zp = new Date(System.currentTimeMillis());
+//	//			this.wert[0] = 0.0;
+//				
+//			}
+//			
+//			public Messung (Date date, double value1, double value2)
+//			{
+//				this();
+//				this.zp = date;
+//				this.wert[0] = value1;
+//				this.wert[1] = value2;
+//				
+//			}
+//			
+//			public Messung (Date date, double value1)
+//			{
+//				this();
+//				this.zp = date;
+//				this.wert[0] = value1;
+//				this.wert[1] = 0;
+//				
+//			}
+//			
+//			public Messung (Date date, double value1, double value2, messArtEnum art)
+//			{
+//				this();
+//				if (art == messArtEnum.blutDruck)
+//				{
+//				this.zp = date;
+//				this.wert[0] = value1;
+//				this.wert[1] = value2;
+//				this.messArtStr = "Blutdruck";
+//				}
+//				
+//				if (art == messArtEnum.blutZucker)
+//				{
+//				this.zp = date;
+//				this.wert[0] = value1;
+//				this.wert[1] = 0;
+//				this.messArtStr = "Glucose";
+//				}
+//				
+//				
+//				if (art == messArtEnum.gewicht)
+//				{
+//				this.zp = date;
+//				this.wert[0] = value1;
+//				this.wert[1] = 0;
+//				this.messArtStr = "Gewicht";
+//				}
+//				
+//				
+//				
+//				
+//				
+//			}
+//			
+//			public Date getDate()
+//			{
+//				return zp;
+//			}
+//			
+//			public double getValueAtIndex(int val)
+//			{
+//				return wert[val];
+//			}
+//			
+//			public String getStrMessArt()
+//			{
+//				
+//				return messArtStr;
+//				
+//			}
+//
+//		
+//			
+//		}
 
 
 	public static void main(String[] args)
