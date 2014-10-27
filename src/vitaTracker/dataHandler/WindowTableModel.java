@@ -32,7 +32,7 @@ public class WindowTableModel extends AbstractTableModel
 			ColumnNames.add( in[0][i].toString() );
 	}
 	
-	private Object[][] getData(Object in[][])
+	protected Object[][] getData(Object in[][])
 	{
 		Object[][] retValue = new Object[anzahlZeilen][anzahlSpalten];
 			

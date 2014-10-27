@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 
+import javax.jws.Oneway;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -48,7 +49,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private URL 				iconURL;
 	private DateTimePicker 		dtp;
 	private Messung 			m;
-	private LinkedList<Messung> messungen = new LinkedList<Messung>();
+	private LinkedList<Object> messungen = new LinkedList<Object>();
 	private Object[][]			objArrTable;
 	private File				file = new File("user.home");
 	private StatusBar			statusBar;
@@ -112,11 +113,17 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 
 		
 		tableColumnNames = new String[] {"Messungsart", "Wert", "Einheit", "Messzeitpunkt"};
-		objArrTable = new Object[tableColumnNames.length][10];
+//		objArrTable = new Object[1][tableColumnNames.length];
+		messungen.add(0, tableColumnNames);
+		objArrTable = new Object[messungen.size()][((String[])(messungen.getFirst())).length];
+		
 		
 		//füllen des objArr
-		for(int i = 0; i<tableColumnNames.length;i++)
+		for(int i = 0; i < tableColumnNames.length;i++)
+		{
 			objArrTable[0][i] = tableColumnNames[i];
+			System.out.println(objArrTable[0][i]);
+		}
 		
 		wTableModel = new WindowTableModel(objArrTable);
 		messungTabelle = new JTable(wTableModel);
@@ -332,29 +339,36 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 				
 		if (messWasCreated)
 		{
-			if (row<=objArrTable.length && row >-1)
-			{
-				objArrTable[row][0] = messungen.get(row).getStrMessArt();
-				
-				if (cBoxMessArten.getSelectedIndex() == BLUTDRUCK)
-				{	objArrTable[row][1] = messungen.get(row).getValueAtIndex(0) + " / " + messungen.get(row).getValueAtIndex(1);
-				} else	{	objArrTable[row][1] = messungen.get(row).getValueAtIndex(0); }
-				
-				objArrTable[row][2] = cBoxMsngUnit.getSelectedItem().toString();
-				objArrTable[row][3] = sDForm.format(messungen.get(row).getDate());
-				
-				messungTabelle.repaint();
-			}
-			else
-			{
-				Object[][] temp = objArrTable.clone();
-				objArrTable = new Object[temp.length+10][4];
-				System.arraycopy(temp, 0, objArrTable, 0, temp.length);
-				temp = null;			
-				
-			}
-		
+//			if (row<=objArrTable.length && row >-1)
+//			{
+//				objArrTable[row][0] = messungen.get(row).getStrMessArt();
+//				
+//				if (cBoxMessArten.getSelectedIndex() == BLUTDRUCK)
+//				{	objArrTable[row][1] = messungen.get(row).getValueAtIndex(0) + " / " + messungen.get(row).getValueAtIndex(1);
+//				} else	{	objArrTable[row][1] = messungen.get(row).getValueAtIndex(0); }
+//				
+//				objArrTable[row][2] = cBoxMsngUnit.getSelectedItem().toString();
+//				objArrTable[row][3] = sDForm.format(messungen.get(row).getDate());
+//				
+//				messungTabelle.repaint();
+//			}
+//			else
+//			{
+//				Object[][] temp = objArrTable.clone();
+//				objArrTable = new Object[temp.length+10][4];
+//				System.arraycopy(temp, 0, objArrTable, 0, temp.length);
+//				temp = null;			
+//				
+//			}
+//		
+			objArrTable = null;
+			objArrTable = new Object[messungen.size()][((String[])(messungen.getFirst())).length];
+			messungTabelle = null;
+			messungTabelle = new JTable(wTableModel);
+			messungTabelle.repaint();
 		}
+		
+		
 	}
 	
 	public void erzeugeMessung()
