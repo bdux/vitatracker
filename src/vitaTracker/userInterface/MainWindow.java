@@ -176,6 +176,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		lblVal1.setBounds(15, 15, 150, 25);
 		eingabeInnerPanel.add(lblVal1);
 		
+		
 		tfVal1 = new ValueField(this);
 		tfVal1.setBounds(15, 35, 75, 25);
 		eingabeInnerPanel.add(tfVal1);
@@ -184,6 +185,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		lblVal2.setBounds(15, 70, 150, 25);
 		eingabeInnerPanel.add(lblVal2);
 
+		
 		
 		tfVal2 = new ValueField(this);
 		tfVal2.setBounds(15,90,75,25);
@@ -366,8 +368,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	public void erzeugeMessung()
 	{
 		
-		double val1 = Double.parseDouble(tfVal1.getText());
-		double val2 = Double.parseDouble(tfVal2.getText());
+		double val1 = 0.0;
+		double val2 = 0.0;
 		
 		switch (cBoxMessArten.getSelectedIndex()) 
 		{
@@ -377,6 +379,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			{		
 				if (tfVal1.getText() != null && tfVal2.getText() != null)
 				{
+					val1 = Double.parseDouble(tfVal1.getText());
+					val2 = Double.parseDouble(tfVal2.getText());
+					
 					if (val1 >= val2)
 					{
 					
@@ -410,7 +415,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		case BLUTZUCKER:
 			
 			try 
-			{		
+			{	
+				val1 = Double.parseDouble(tfVal1.getText());
 				if (tfVal1.getText() != null )
 				{
 					this.m = new Messung(this.getDateMessung(),val1,
@@ -435,6 +441,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			
 			try 
 			{		
+				val1 = Double.parseDouble(tfVal1.getText());
 				if (tfVal1.getText() != null )
 				{
 					this.m = new Messung(this.getDateMessung(),val1,

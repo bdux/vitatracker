@@ -95,11 +95,11 @@ public class ValueField extends JTextField implements KeyListener, FocusListener
 	@Override
 	public void keyTyped(KeyEvent e)
 	{
-		JTextField tf = null;
+		ValueField vf = null;
 
 		
 		if (e.getSource() instanceof ValueField)
-			tf = (ValueField) e.getSource();
+			vf = (ValueField) e.getSource();
 		else
 			return;
 
@@ -108,7 +108,7 @@ public class ValueField extends JTextField implements KeyListener, FocusListener
 			return;
 							
 		// Überprüfung auf Ziffer 0 - 9
-		if (!Character.isDigit(e.getKeyChar()) )
+		if (!Character.isDigit(e.getKeyChar()))
 		{
 			Toolkit.getDefaultToolkit().beep();
 			e.consume();
@@ -116,17 +116,14 @@ public class ValueField extends JTextField implements KeyListener, FocusListener
 			return;
 		}
 		
-		if (e.getKeyChar() == KeyEvent.VK_BACK_SPACE && tf.getText()=="")
-		{
-			caller.setStatusBarText("Bereit");
-			caller.setbtnMessAddEnabledState(false);
-		}
-
+		
+		
+		
 		// Zuerst die markierten Zeichen löschen.
-		tf.replaceSelection("");
+		vf.replaceSelection("");
 
 		
-		if (tf.getText().length() >= 6)
+		if (vf.getText().length() >= 6)
 		{
 			Toolkit.getDefaultToolkit().beep();
 			e.consume();
@@ -140,7 +137,7 @@ public class ValueField extends JTextField implements KeyListener, FocusListener
 		
 		
 		
-		if (convertTextField2Value(tf, e) > MAX_GlUCOVALUE)
+		if (convertTextField2Value(vf, e) > MAX_GlUCOVALUE)
 		{
 			Toolkit.getDefaultToolkit().beep();
 			e.consume();
