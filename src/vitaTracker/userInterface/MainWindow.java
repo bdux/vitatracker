@@ -71,7 +71,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 	}
 	
-	
 	private void Show()
 	{
 		
@@ -85,8 +84,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	{
 		
 	}
-	
-	
 	
 	/*
 	 * initialisiert die Fensterkomponenten
@@ -211,7 +208,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 
 		btnMessAdd = new JButton("Messung hinzufügen");
 		btnMessAdd.addActionListener(this);
-		btnMessAdd.setEnabled(false);
+		btnMessAdd.setEnabled(true);
 		pnlBtnFootPanel.add(btnMessAdd);
 		
 		btnMessCommit = new JButton("Messungen Sichern");
@@ -250,7 +247,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		btnMessAdd.setEnabled(bool);
 		
 	}
-	
 	
 	private void setUIEntries(int messung)
 	{
@@ -295,7 +291,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		}
 		
 	}
-	
 
 	private void dateiLesen()
 	{
@@ -320,13 +315,11 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 
 		dateiLesenBufferedReader(fc.getSelectedFile().toString());
 	}
-	
 
 	private void dateiLesenBufferedReader(String string) {
 		// TODO Auto-generated method stub
 		
 	}
-
 
 	private void addTableEntry(int row)
 	{
@@ -357,28 +350,24 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		}
 	}
-
+	
 	public void erzeugeMessung()
 	{
 		
-		double val1 = 0.0;
-		double val2 = 0.0;
-		
-		switch (cBoxMessArten.getSelectedIndex()) 
+	
+		try
 		{
-		
-		case BLUTDRUCK:
-			try 
-			{		
+			switch (cBoxMessArten.getSelectedIndex()) 
+			{
+			
+			case BLUTDRUCK:
 				if (tfVal1.getText() != null && tfVal2.getText() != null)
 				{
-					val1 = Double.parseDouble(tfVal1.getText());
-					val2 = Double.parseDouble(tfVal2.getText());
-					
-					if (val1 >= val2)
+										
+					if (Double.parseDouble(tfVal1.getText()) >= Double.parseDouble(tfVal2.getText()))
 					{
 					
-					this.m = new Messung(this.getDateMessung(),val1,val2,
+					this.m = new Messung(this.getDateMessung(),Double.parseDouble(tfVal1.getText()),Double.parseDouble(tfVal2.getText()),
 					messArtEnum.blutDruck);
 					
 					
@@ -392,87 +381,62 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 					statusBar.setText("Der systolische Wert muss grösser als der Diastolische sein.");
 					
 				}	
+				else
+					statusBar.setText("Messung kann nicht übernommen werden.");
+		
+				break;
 				
-			} catch (Exception e) {
-				
-				System.out.println("geht nicht!");
-				statusBar.setText("Messung konnte nicht hinzugefügt werden.");
-				messWasCreated = false;
-				
-			}
-		
-		break;
-		
-		
-		
-		case BLUTZUCKER:
+			case BLUTZUCKER:
 			
-			try 
-			{	
-				val1 = Double.parseDouble(tfVal1.getText());
 				if (tfVal1.getText() != null )
 				{
-					this.m = new Messung(this.getDateMessung(),val1,
+					this.m = new Messung(this.getDateMessung(),Double.parseDouble(tfVal1.getText()),
 							0,
 							messArtEnum.blutZucker);
 					tfVal1.setText("");
 					messWasCreated = true;
-					
-					
-				}	
+				}
 				
-			} catch (Exception e) {
-				System.out.println("geht nicht!");
-				messWasCreated = false;
+				break;
 				
+			case GEWICHT:
 				
-			}
-			
-		break;
-		
-		case GEWICHT:
-			
-			try 
-			{		
-				val1 = Double.parseDouble(tfVal1.getText());
 				if (tfVal1.getText() != null )
 				{
-					this.m = new Messung(this.getDateMessung(),val1,
+					this.m = new Messung(this.getDateMessung(),Double.parseDouble(tfVal1.getText()),
 							0,
 							messArtEnum.gewicht);
 					tfVal1.setText("");
 					messWasCreated = true;
-					
-					
+							
 				}	
 				
-			} catch (Exception e) {
-				System.out.println("geht nicht!");
-				messWasCreated = false;
+				break;
 				
 			}
-		break;
 			
-		}
-		
-		addMessung(m);
-		
-		if (messWasCreated)
-		{	
-			addTableEntry(messungen.size()-1);
-			btnMessAdd.setEnabled(!messWasCreated);
 			
-			messWasCreated = false;		
+			
+		} 
+		catch (Exception e)
+		{
+			statusBar.setText(e.getMessage());
+		} 
+		finally
+		{
+			
+			if (messWasCreated)
+			{	
+				addMessung(m);
+				addTableEntry(messungen.size()-1);
+				messWasCreated = false;		
+			}
 		}
-		
 		
 	}
-
-
 	
 	
-
-
+	
 	private void addMessung(Messung m)
 	{
 		if (m != null)
@@ -483,14 +447,11 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 	}
 
-
-
 	public Date getDateMessung()
 	{
 				
 		return dateMessung;
 	}
-
 
 	public void setDateMessung(Date dateMessung)
 	{
@@ -498,6 +459,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		tfMessZeit.setText(sDForm.format(dateMessung).toString());
 	}
 	
+	/*die Listener-Methoden*/
 	
 	@Override
 	public void actionPerformed(ActionEvent e)
@@ -521,10 +483,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	@Override
 	public void windowActivated(WindowEvent e){}
 
-
 	@Override
 	public void windowClosed(WindowEvent e)	{}
-
 
 	@Override
 	public void windowClosing(WindowEvent e)
@@ -533,22 +493,17 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 	}
 
-
 	@Override
 	public void windowDeactivated(WindowEvent e){}
-
 
 	@Override
 	public void windowDeiconified(WindowEvent e){}
 
-
 	@Override
 	public void windowIconified(WindowEvent e){}
 
-
 	@Override
 	public void windowOpened(WindowEvent e)	{}
-
 
 	@Override
 	public void itemStateChanged(ItemEvent e) 
@@ -562,7 +517,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		
 	}
-
 	
 	public static void main(String[] args)
 		{

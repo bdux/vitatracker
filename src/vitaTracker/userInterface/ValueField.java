@@ -3,7 +3,7 @@ package vitaTracker.userInterface;
 import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.event.*;
-import java.text.*;
+
 
 import javax.swing.*;
 
@@ -16,7 +16,7 @@ public class ValueField extends JTextField implements KeyListener, FocusListener
 {
 	
 	MainWindow caller;
-	
+
 	protected final double MAX_GLUCOVALUE = 500.0, MAX_METRICWEIGHT = 250.0, MAX_IMPERIALWEIGHT = 362.2;
 	protected final double MIN_VALUE = 0.0;
 
@@ -24,6 +24,7 @@ public class ValueField extends JTextField implements KeyListener, FocusListener
 	public ValueField()
 	{
 		super();
+		
 		this.addKeyListener(this);
 		this.addFocusListener(this);
 		
@@ -44,14 +45,6 @@ public class ValueField extends JTextField implements KeyListener, FocusListener
 		
 		try
 		{
-			if (s == "")
-			{
-				caller.setbtnMessAddEnabledState(false);
-				return retval;
-				
-			}
-			else
-				
 			Double.parseDouble(s);
 			retval = true;
 			caller.setStatusBarText("Bereit");
@@ -131,11 +124,7 @@ public class ValueField extends JTextField implements KeyListener, FocusListener
 
 
 	@Override
-	public void keyReleased(KeyEvent e)
-	{
-		// TODO Auto-generated method stub
-		
-	}
+	public void keyReleased(KeyEvent e) {}
 
 
 	@Override
@@ -207,14 +196,7 @@ public class ValueField extends JTextField implements KeyListener, FocusListener
 			if(	validate(this.getText()))
 			{
 				caller.setStatusBarText("Bereit.");
-				caller.setbtnMessAddEnabledState(true);
-
-			}
-			
-			else
-			{
-				caller.setbtnMessAddEnabledState(false);
-				
+		
 			}					
 		}
 	}
