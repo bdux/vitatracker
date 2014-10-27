@@ -37,6 +37,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private JLabel				lblVal1, lblVal2, /*glucoVal, gewichtVal*/ messZeit, lblUnit;
 	private JTextField			/*tfVal1, tfVal2 tfGlucoVal, tfGewichtVal*/ tfMessZeit;
 	private ValueField			tfVal1, tfVal2;
+	
 	private JTable				messungTabelle;
 	private WindowTableModel	wTableModel;
 	private String[]			strArrmessArten, strMessUnits, tableColumnNames;
@@ -116,7 +117,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		tableColumnNames = new String[] {"Messungsart", "Wert", "Einheit", "Messzeitpunkt"};
 		objArrTable = new Object[4][10];
 		messungTabelle = new JTable(objArrTable, tableColumnNames);
-		messungTabelle.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		messungTabelle.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		
 		
 		JScrollPane tableScroll = new JScrollPane(messungTabelle);
@@ -177,6 +178,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		eingabeInnerPanel.add(lblVal1);
 		
 		
+
 		tfVal1 = new ValueField(this);
 		tfVal1.setBounds(15, 35, 75, 25);
 		eingabeInnerPanel.add(tfVal1);
@@ -231,9 +233,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	
 	/**
-	 * ï¿½ndert die Ansicht fï¿½r das Eingabepanel entsprechend der auswahl der cBoxMessArten
+	 * Ändert die Ansicht für das Eingabepanel entsprechend der auswahl der cBoxMessArten
 	 * <br></br>
-	 * @param int messung: Integer Wert zur ï¿½bergabe and das Messeinheiten Array 
+	 * @param int messung: Integer Wert zur Übergabe and das Messeinheiten Array 
 	 * 
 	 */
 	
@@ -295,14 +297,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 	
 
-
-//	private void checkSelection()
-//	{
-//		
-//			System.out.println("die Auswahl ist: " + cBoxMessArten.getSelectedItem().toString());
-//			System.out.println(cBoxMessArten.getSelectedIndex() + " index");
-//	}
-//	
 	private void dateiLesen()
 	{
 		
@@ -363,7 +357,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		}
 	}
-
 
 	public void erzeugeMessung()
 	{
@@ -570,8 +563,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 	}
 
-
-	
 	
 	public static void main(String[] args)
 		{
