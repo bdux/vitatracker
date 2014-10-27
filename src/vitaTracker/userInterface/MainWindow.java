@@ -25,11 +25,12 @@ import vitaTracker.dataHandler.messungen.Messung.messArtEnum;
  * @author Benjamin Dux
  *
  */
-public class MainWindow extends JFrame implements ActionListener, WindowListener, ItemListener, PropertyChangeListener
+public class MainWindow extends JFrame implements ActionListener, WindowListener, ItemListener
 {
 
 	private JPanel 				chartPanel, eingabePanel, eingabeInnerPanel, headPanel,pnlBtnFootPanel;
-	private JButton				btnMessAdd, btnFelderLoeschen, btnDatenHolen,btnMessZeitSetzen, btnMessCommit;
+	private JButton				btnFelderLoeschen, btnDatenHolen,btnMessZeitSetzen, btnMessCommit;
+	private JButton				btnMessAdd;
 	private JMenuBar 			menuBar;
 	private JMenu 				datei, extras;
 	private JMenuItem 			miLoad, miSave, miExit;
@@ -52,13 +53,14 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private StatusBar			statusBar;
 	private BorderLayout		FrameLayout, ePBl, hPBl;
 	private GridLayout			bFPl;
-	private DecimalFormat		df;
+	
+	
 	private boolean messWasCreated = false;
 
 	
 	// Diverse Parameter Ints 
 	public static final	int BLUTDRUCK = 0, BLUTZUCKER = 1, GEWICHT = 2,
-							DEFAULT_SELECTION = BLUTDRUCK, BP_UNIT = 0, WEIGHT_METRIC = 1, 
+							DEFAULT_SELECTION = GEWICHT, BP_UNIT = 0, WEIGHT_METRIC = 1, 
 							WEIGHT_IMPERIAL = 2, GLUCO_MOL = 3, GLUCO_MG = 4;
 	
 	public MainWindow()
@@ -80,7 +82,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	private void initFrame()
 	{
-//		new ItemEvent(cBoxMessArten, ItemEvent.ITEM_STATE_CHANGED,this,ItemEvent.SELECTED);
 		
 	}
 	
@@ -95,8 +96,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		hPBl = new BorderLayout(2, 2);
 		bFPl = new GridLayout(0, 1);
 		FrameLayout = new BorderLayout();
-		df = new DecimalFormat("0.##");
-		df.setDecimalSeparatorAlwaysShown(true);
+		
 		
 		this.setBounds(100, 100, 400, 350);
 		this.setLocationRelativeTo(null);
@@ -116,7 +116,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		tableColumnNames = new String[] {"Messungsart", "Wert", "Einheit", "Messzeitpunkt"};
 		objArrTable = new Object[4][10];
 		messungTabelle = new JTable(objArrTable, tableColumnNames);
-		messungTabelle.addPropertyChangeListener(this);
+		messungTabelle.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		
 		
 		JScrollPane tableScroll = new JScrollPane(messungTabelle);
@@ -173,21 +173,20 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		headPanel.add(lblUnit, hPBl.CENTER);
 				
 		lblVal1 = new JLabel("Systolischer Wert");
-		lblVal1.setBounds(15, 20, 150, 25);
+		lblVal1.setBounds(15, 15, 150, 25);
 		eingabeInnerPanel.add(lblVal1);
 		
-		tfVal1 = new ValueField(df);
-		tfVal1.setBounds(15, 45, 75, 25);
-		tfVal1.addActionListener(this);
+		tfVal1 = new ValueField(this);
+		tfVal1.setBounds(15, 35, 75, 25);
 		eingabeInnerPanel.add(tfVal1);
 		
 		lblVal2 = new JLabel("Diastolischer Wert");
-		lblVal2.setBounds(15, 95, 150, 25);
+		lblVal2.setBounds(15, 70, 150, 25);
 		eingabeInnerPanel.add(lblVal2);
 
 		
-		tfVal2 = new ValueField(df);
-		tfVal2.setBounds(15,120,75,25);
+		tfVal2 = new ValueField(this);
+		tfVal2.setBounds(15,90,75,25);
 		eingabeInnerPanel.add(tfVal2);
 		
 		messZeit = new JLabel("Messzeitpunkt: ");
@@ -208,7 +207,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 
 		btnMessAdd = new JButton("Messung hinzufügen");
 		btnMessAdd.addActionListener(this);
-		btnMessAdd.setEnabled(true);
+		btnMessAdd.setEnabled(false);
 		pnlBtnFootPanel.add(btnMessAdd);
 		
 		btnMessCommit = new JButton("Messungen Sichern");
@@ -235,6 +234,20 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	 * @param int messung: Integer Wert zur ï¿½bergabe and das Messeinheiten Array 
 	 * 
 	 */
+	
+	public void setStatusBarText(String s)
+	{
+		statusBar.setText(s);		
+	}
+	
+	public void setbtnMessAddEnabledState( boolean bool)
+	{
+		
+		btnMessAdd.setEnabled(bool);
+		
+	}
+	
+	
 	private void setUIEntries(int messung)
 	{
 		cBoxMsngUnit.removeAllItems();
@@ -246,7 +259,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			lblVal1.setText("Systolischer Wert");
 			lblVal2.setText("Diastolischer Wert");
 			lblVal2.setVisible(true);
-			tfVal2.setVisible(true);
+			tfVal2.setEnabled(true);
 			tfVal2.setEnabled(true);
 			
 			break;
@@ -258,8 +271,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			lblVal1.setText("Blutzuckerwert");
 			lblVal2.setVisible(false);
 			tfVal2.setText(null);
-			tfVal2.setVisible(false);
 			tfVal2.setEnabled(false);
+//			tfVal2.setEnabled(false);
 			
 			break;
 			
@@ -270,7 +283,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			lblVal1.setText("Gewicht");
 			lblVal2.setVisible(false);
 			tfVal2.setText(null);
-			tfVal2.setVisible(false);
+//			tfVal2.setVisible(false);
 			tfVal2.setEnabled(false);
 			
 			
@@ -353,6 +366,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	public void erzeugeMessung()
 	{
 		
+		double val1 = Double.parseDouble(tfVal1.getText());
+		double val2 = Double.parseDouble(tfVal2.getText());
+		
 		switch (cBoxMessArten.getSelectedIndex()) 
 		{
 		
@@ -361,21 +377,28 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			{		
 				if (tfVal1.getText() != null && tfVal2.getText() != null)
 				{
-					this.m = new Messung(this.getDateMessung(),
-							Double.parseDouble(tfVal1.getText()),
-							Double.parseDouble(tfVal2.getText()),
-							messArtEnum.blutDruck);
+					if (val1 >= val2)
+					{
+					
+					this.m = new Messung(this.getDateMessung(),val1,val2,
+					messArtEnum.blutDruck);
 					
 					
 					tfVal1.setText("");
 					tfVal2.setText("");
 					messWasCreated = true;
+					btnMessAdd.setEnabled(false);
+					statusBar.setText("Bereit");
+					}
+					else
+					statusBar.setText("Der systolische Wert muss grösser als der Diastolische sein.");
 					
 				}	
 				
 			} catch (Exception e) {
+				
 				System.out.println("geht nicht!");
-				JOptionPane.showMessageDialog(this, "Falsche Eingabe: Eines der Felder ist leer.", "Fehler", JOptionPane.OK_OPTION, null);
+				statusBar.setText("Messung konnte nicht hinzugefügt werden.");
 				messWasCreated = false;
 				
 			}
@@ -390,18 +413,19 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			{		
 				if (tfVal1.getText() != null )
 				{
-					this.m = new Messung(this.getDateMessung(),
-							Double.parseDouble(tfVal1.getText()),
+					this.m = new Messung(this.getDateMessung(),val1,
 							0,
 							messArtEnum.blutZucker);
 					tfVal1.setText("");
 					messWasCreated = true;
+					
 					
 				}	
 				
 			} catch (Exception e) {
 				System.out.println("geht nicht!");
 				messWasCreated = false;
+				
 				
 			}
 			
@@ -413,12 +437,12 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			{		
 				if (tfVal1.getText() != null )
 				{
-					this.m = new Messung(this.getDateMessung(),
-							Double.parseDouble(tfVal1.getText()),
+					this.m = new Messung(this.getDateMessung(),val1,
 							0,
 							messArtEnum.gewicht);
 					tfVal1.setText("");
 					messWasCreated = true;
+					
 					
 				}	
 				
@@ -432,9 +456,12 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		}
 		
 		addMessung(m);
+		
 		if (messWasCreated)
 		{	
 			addTableEntry(messungen.size()-1);
+			btnMessAdd.setEnabled(!messWasCreated);
+			
 			messWasCreated = false;		
 		}
 		
@@ -442,6 +469,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 
 
+	
 	
 
 
@@ -455,14 +483,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 	}
 
-
-	
-
-
-	public void setMessungen(Messung messungen)
-	{
-	
-	}
 
 
 	public Date getDateMessung()
@@ -495,8 +515,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		else if (o == miLoad)
 			dateiLesen();
 		
-		else if (o == tfVal1 )
-			btnMessAdd.setEnabled(true);
+		
 	}
 
 	@Override
@@ -538,7 +557,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		if(o == cBoxMessArten)
 		{
-//			updateEingabePanel();
 			setUIEntries(cBoxMessArten.getSelectedIndex());
 		}
 		
@@ -556,12 +574,5 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		}
 
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt)
-	{
-		if (evt.getSource() == messungTabelle)
-			btnMessCommit.setEnabled(true);
-		
-	}
 
 }
