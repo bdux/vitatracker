@@ -2,37 +2,30 @@ package vitaTracker.userInterface;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.net.URL;
-import java.text.ParseException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.Properties;
 
-import resource.*;
-
-import javax.activation.DataHandler;
-import javax.jws.Oneway;
 import javax.swing.*;
-import javax.swing.JFormattedTextField.AbstractFormatter;
-import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.MaskFormatter;
 
+import vitaTracker.dataHandler.WindowTableModel;
 import vitaTracker.Util.*;
-import vitaTracker.dataHandler.*;
-//import vitaTracker.dataHandler.messungen.MessWert;
 import vitaTracker.dataHandler.messungen.Messung;
 import vitaTracker.dataHandler.messungen.Messung.messArtEnum;
-//import vitaTracker.dataHandler.messungen.Messung.messArtEnum;
+
 /**
  * 
  * @author Benjamin Dux
  *
  */
-public class MainWindow extends JFrame implements ActionListener, WindowListener, ItemListener
+public class MainWindow extends JFrame implements ActionListener, WindowListener, ItemListener, PropertyChangeListener
 {
 
 	private JPanel 				chartPanel, eingabePanel, eingabeInnerPanel, headPanel,pnlBtnFootPanel;
@@ -42,7 +35,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private JMenuItem 			miLoad, miSave, miExit;
 	private JLabel				lblVal1, lblVal2, /*glucoVal, gewichtVal*/ messZeit, lblUnit;
 	private JTextField			/*tfVal1, tfVal2 tfGlucoVal, tfGewichtVal*/ tfMessZeit;
-	private JFormattedTextField	tfVal1, tfVal2;
+	private ValueField			tfVal1, tfVal2;
 	private JTable				messungTabelle;
 	private WindowTableModel	wTableModel;
 	private String[]			strArrmessArten, strMessUnits, tableColumnNames;
@@ -59,9 +52,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private StatusBar			statusBar;
 	private BorderLayout		FrameLayout, ePBl, hPBl;
 	private GridLayout			bFPl;
-	
+	private DecimalFormat		df;
 	private boolean messWasCreated = false;
-//	private enum messArtEnum {blutDruck, gewicht, blutZucker};
+
 	
 	// Diverse Parameter Ints 
 	public static final	int BLUTDRUCK = 0, BLUTZUCKER = 1, GEWICHT = 2,
@@ -102,6 +95,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		hPBl = new BorderLayout(2, 2);
 		bFPl = new GridLayout(0, 1);
 		FrameLayout = new BorderLayout();
+		df = new DecimalFormat("0.##");
+		df.setDecimalSeparatorAlwaysShown(true);
 		
 		this.setBounds(100, 100, 400, 350);
 		this.setLocationRelativeTo(null);
@@ -121,11 +116,13 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		tableColumnNames = new String[] {"Messungsart", "Wert", "Einheit", "Messzeitpunkt"};
 		objArrTable = new Object[4][10];
 		messungTabelle = new JTable(objArrTable, tableColumnNames);
-//		wTableModel = new WindowTableModel(objArrTable);
-//		messungTabelle = new JTable(wTableModel);
+		messungTabelle.addPropertyChangeListener(this);
+		
 		
 		JScrollPane tableScroll = new JScrollPane(messungTabelle);
 		this.add(tableScroll, FrameLayout.CENTER);
+		
+		
 		
 		strArrmessArten = new String[] {"Blutdruck","Blutzucker","Gewicht"};
 		strMessUnits = new String[] {"mmHg","Kg","lbs","mmol/L","mg/dL"};
@@ -160,15 +157,12 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		cBoxMessArten = new JComboBox<String>(strArrmessArten);
 		cBoxMessArten.setSelectedItem(strArrmessArten[DEFAULT_SELECTION]);
-//		cBoxMessArten.setBounds(5, 5, 125, 25);
-//		cBoxMessArten.addActionListener(this);
 		cBoxMessArten.setPreferredSize(new Dimension(200,25));
 		cBoxMessArten.addItemListener(this);
 		headPanel.add(cBoxMessArten, hPBl.LINE_START);
 		
 		
 		cBoxMsngUnit = new JComboBox<String>();
-//		cBoxMsngUnit.addItem(strMessUnits[cBoxMessArten.getSelectedIndex()]);
 		cBoxMsngUnit.setPreferredSize(new Dimension(100,25));
 		cBoxMsngUnit.addItemListener(this);
 		headPanel.add(cBoxMsngUnit, hPBl.LINE_END);
@@ -182,8 +176,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		lblVal1.setBounds(15, 20, 150, 25);
 		eingabeInnerPanel.add(lblVal1);
 		
-		tfVal1 = new JFormattedTextField(createFormatter("###'.##"));
+		tfVal1 = new ValueField(df);
 		tfVal1.setBounds(15, 45, 75, 25);
+		tfVal1.addActionListener(this);
 		eingabeInnerPanel.add(tfVal1);
 		
 		lblVal2 = new JLabel("Diastolischer Wert");
@@ -191,9 +186,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		eingabeInnerPanel.add(lblVal2);
 
 		
-		tfVal2 = new JFormattedTextField(createFormatter("###'.'##"));
-		
-		
+		tfVal2 = new ValueField(df);
 		tfVal2.setBounds(15,120,75,25);
 		eingabeInnerPanel.add(tfVal2);
 		
@@ -214,13 +207,11 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		eingabeInnerPanel.add(btnMessZeitSetzen);
 
 		btnMessAdd = new JButton("Messung hinzufügen");
-//		btnMessungAdd.setBounds(15, 400, 150, 25);
 		btnMessAdd.addActionListener(this);
-		btnMessAdd.setEnabled(false);
+		btnMessAdd.setEnabled(true);
 		pnlBtnFootPanel.add(btnMessAdd);
 		
 		btnMessCommit = new JButton("Messungen Sichern");
-//		btnMessCommit.setBounds(15, 400, 150, 25);
 		btnMessCommit.addActionListener(this);
 		btnMessCommit.setEnabled(false);
 		pnlBtnFootPanel.add(btnMessCommit);
@@ -256,6 +247,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			lblVal2.setText("Diastolischer Wert");
 			lblVal2.setVisible(true);
 			tfVal2.setVisible(true);
+			tfVal2.setEnabled(true);
 			
 			break;
 
@@ -267,6 +259,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			lblVal2.setVisible(false);
 			tfVal2.setText(null);
 			tfVal2.setVisible(false);
+			tfVal2.setEnabled(false);
 			
 			break;
 			
@@ -278,6 +271,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			lblVal2.setVisible(false);
 			tfVal2.setText(null);
 			tfVal2.setVisible(false);
+			tfVal2.setEnabled(false);
 			
 			
 			break;
@@ -287,8 +281,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 
 
-
-	//	private void checkSelection()
+//	private void checkSelection()
 //	{
 //		
 //			System.out.println("die Auswahl ist: " + cBoxMessArten.getSelectedItem().toString());
@@ -315,8 +308,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		fc.getSelectedFile();
 		
-//		dateiLesen(fc.getSelectedFile().toString());
-//		dateiLesenStringBuilder(fc.getSelectedFile().toString());
+
 		dateiLesenBufferedReader(fc.getSelectedFile().toString());
 	}
 	
@@ -496,12 +488,15 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			this.dispose();
 		else if (o == btnMessZeitSetzen)
 			dtp = new DateTimePicker(this);
+		
 		else if (o == btnMessAdd)
-		{ 
-			erzeugeMessung();		
-		}
+				erzeugeMessung();		
+		
 		else if (o == miLoad)
 			dateiLesen();
+		
+		else if (o == tfVal1 )
+			btnMessAdd.setEnabled(true);
 	}
 
 	@Override
@@ -545,200 +540,13 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		{
 //			updateEingabePanel();
 			setUIEntries(cBoxMessArten.getSelectedIndex());
-		}	
+		}
+		
 		
 	}
 
 
-//	private static class Messung
-//		{
-//			private Date zp;
-//			private double[] wert = {0,0};
-//			private String messArtStr = null;
-//			
-//			public Messung()
-//			{
-//				
-//				this.zp = new Date(System.currentTimeMillis());
-//	//			this.wert[0] = 0.0;
-//				
-//			}
-//			
-//			public Messung (Date date, double value1, double value2)
-//			{
-//				this();
-//				this.zp = date;
-//				this.wert[0] = value1;
-//				this.wert[1] = value2;
-//				
-//			}
-//			
-//			public Messung (Date date, double value1)
-//			{
-//				this();
-//				this.zp = date;
-//				this.wert[0] = value1;
-//				this.wert[1] = 0;
-//				
-//			}
-//			
-//			public Messung (Date date, double value1, double value2, messArtEnum art)
-//			{
-//				this();
-//				if (art == messArtEnum.blutDruck)
-//				{
-//				this.zp = date;
-//				this.wert[0] = value1;
-//				this.wert[1] = value2;
-//				this.messArtStr = "Blutdruck";
-//				}
-//				
-//				if (art == messArtEnum.blutZucker)
-//				{
-//				this.zp = date;
-//				this.wert[0] = value1;
-//				this.wert[1] = 0;
-//				this.messArtStr = "Glucose";
-//				}
-//				
-//				
-//				if (art == messArtEnum.gewicht)
-//				{
-//				this.zp = date;
-//				this.wert[0] = value1;
-//				this.wert[1] = 0;
-//				this.messArtStr = "Gewicht";
-//				}
-//				
-//				
-//				
-//				
-//				
-//			}
-//			
-//			public Date getDate()
-//			{
-//				return zp;
-//			}
-//			
-//			public double getValueAtIndex(int val)
-//			{
-//				return wert[val];
-//			}
-//			
-//			public String getStrMessArt()
-//			{
-//				
-//				return messArtStr;
-//				
-//			}
-//
-//		
-//			
-//		}
-
-
 	
-
-
-	//	private static class Messung
-	//		{
-	//			private Date zp;
-	//			private double[] wert = {0,0};
-	//			private String messArtStr = null;
-	//			
-	//			public Messung()
-	//			{
-	//				
-	//				this.zp = new Date(System.currentTimeMillis());
-	//	//			this.wert[0] = 0.0;
-	//				
-	//			}
-	//			
-	//			public Messung (Date date, double value1, double value2)
-	//			{
-	//				this();
-	//				this.zp = date;
-	//				this.wert[0] = value1;
-	//				this.wert[1] = value2;
-	//				
-	//			}
-	//			
-	//			public Messung (Date date, double value1)
-	//			{
-	//				this();
-	//				this.zp = date;
-	//				this.wert[0] = value1;
-	//				this.wert[1] = 0;
-	//				
-	//			}
-	//			
-	//			public Messung (Date date, double value1, double value2, messArtEnum art)
-	//			{
-	//				this();
-	//				if (art == messArtEnum.blutDruck)
-	//				{
-	//				this.zp = date;
-	//				this.wert[0] = value1;
-	//				this.wert[1] = value2;
-	//				this.messArtStr = "Blutdruck";
-	//				}
-	//				
-	//				if (art == messArtEnum.blutZucker)
-	//				{
-	//				this.zp = date;
-	//				this.wert[0] = value1;
-	//				this.wert[1] = 0;
-	//				this.messArtStr = "Glucose";
-	//				}
-	//				
-	//				
-	//				if (art == messArtEnum.gewicht)
-	//				{
-	//				this.zp = date;
-	//				this.wert[0] = value1;
-	//				this.wert[1] = 0;
-	//				this.messArtStr = "Gewicht";
-	//				}
-	//				
-	//				
-	//				
-	//				
-	//				
-	//			}
-	//			
-	//			public Date getDate()
-	//			{
-	//				return zp;
-	//			}
-	//			
-	//			public double getValueAtIndex(int val)
-	//			{
-	//				return wert[val];
-	//			}
-	//			
-	//			public String getStrMessArt()
-	//			{
-	//				
-	//				return messArtStr;
-	//				
-	//			}
-	//
-	//		
-	//			
-	//		}
-	
-	
-	protected MaskFormatter createFormatter(String s) {
-	    MaskFormatter formatter = null;
-	    try {
-	        formatter = new MaskFormatter(s);
-	    } catch (java.text.ParseException exc) {
-	        System.err.println("formatter is bad: " + exc.getMessage());
-	        System.exit(-1);
-	    }
-	    return formatter;
-	}	
 	
 	public static void main(String[] args)
 		{
@@ -746,5 +554,14 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			mw.Show();
 		
 		}
+
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt)
+	{
+		if (evt.getSource() == messungTabelle)
+			btnMessCommit.setEnabled(true);
+		
+	}
 
 }
