@@ -112,8 +112,14 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 
 		
 		tableColumnNames = new String[] {"Messungsart", "Wert", "Einheit", "Messzeitpunkt"};
-		objArrTable = new Object[4][10];
-		messungTabelle = new JTable(objArrTable, tableColumnNames);
+		objArrTable = new Object[tableColumnNames.length][10];
+		
+		//füllen des objArr
+		for(int i = 0; i<tableColumnNames.length;i++)
+			objArrTable[0][i] = tableColumnNames[i];
+		
+		wTableModel = new WindowTableModel(objArrTable);
+		messungTabelle = new JTable(wTableModel);
 		messungTabelle.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		
 		
