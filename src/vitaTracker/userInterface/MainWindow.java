@@ -44,7 +44,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	private JTable				messungTabelle;
 	private JScrollPane 		tableScroll;
-//	private WindowTableModel	wTableModel;
+	private WindowTableModel	wTableModel;
 	private String[]			strArrmessArten, strMessUnits, tableColumnNames;
 	private Date				dateMessung;
 	private Calendar			calDateMess;
@@ -132,10 +132,12 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 				
 		objArrTable = new Object[messungen.size()+1][tableColumnNames.length];  
 		
+		for (int i=0;i<tableColumnNames.length;i++)
+			objArrTable[0][i] = tableColumnNames[i];
 		
-//		wTableModel= new WindowTableModel(objArrTable);
-		messungTabelle = new JTable(objArrTable, tableColumnNames);
-
+		wTableModel= new WindowTableModel(objArrTable);
+//		messungTabelle = new JTable(wTableModel);
+		messungTabelle = new JTable(new WindowTableModel(objArrTable));
 		tableScroll = new JScrollPane(messungTabelle);
 		this.add(tableScroll, FrameLayout.CENTER);
 		
@@ -344,30 +346,30 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private void addTableEntry(int row)
 	{
 		
-				
-		if (row <= messungen.size())
-		{	
+		if (row<=objArrTable.length && row >-1)
+		{
 			objArrTable[row][0] = messungen.get(row).getStrMessArt();
-			objArrTable[row][1] = messungen.get(row).getValueAtIndex(0);			
-			objArrTable[row][2] = strMessUnits[cBoxMsngUnit.getSelectedIndex()];
-			objArrTable[row][3] = messungen.get(row).getDate();
-			messungTabelle.repaint();
-				
-		}
-		
-		else
 			
+			if (cBoxMessArten.getSelectedIndex() == BLUTDRUCK)
+			{	objArrTable[row][1] = messungen.get(row).getValueAtIndex(0) + " / " + messungen.get(row).getValueAtIndex(1);
+			} else	{	objArrTable[row][1] = messungen.get(row).getValueAtIndex(0); }
+			
+			objArrTable[row][2] = cBoxMsngUnit.getSelectedItem().toString();
+			objArrTable[row][3] = sDForm.format(messungen.get(row).getDate());
+			
+			messungTabelle.setModel(new WindowTableModel(objArrTable));
+		}
+		else
 		{
 			extendMessArray(objArrTable);
-			objArrTable[row][0] = messungen.get(row).getStrMessArt();
-			objArrTable[row][1] = messungen.get(row).getValueAtIndex(0);			
-			objArrTable[row][2] = strMessUnits[cBoxMsngUnit.getSelectedIndex()];
-			objArrTable[row][3] = messungen.get(row).getDate();
-			messungTabelle.repaint();
 			
 		}
-
+				
 	}
+		
+		
+
+	
 
 
 		
