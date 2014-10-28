@@ -21,8 +21,6 @@ public class WindowTableModel extends AbstractTableModel
 		
 		this.data = getData(in);
 		
-		for(String s : ColumnNames)
-			System.out.println(s);
 	}
 	
 	private void setHeader(Object[][] in)
@@ -39,7 +37,9 @@ public class WindowTableModel extends AbstractTableModel
 		for (int zeile = 1; zeile < anzahlZeilen; zeile++)
 		{
 			for (int spalte = 0; spalte < anzahlSpalten; spalte++)
-				retValue[zeile-1][spalte] = in[zeile][spalte];
+					retValue[zeile-1][spalte] = in[zeile][spalte];
+				
+				
 		}
 		
 		return retValue;
@@ -47,7 +47,7 @@ public class WindowTableModel extends AbstractTableModel
  
 	
 	// Keine abstrakte Methode.
-	// Muss manuell �berschrieben werden.	
+	// Muss manuell Überschrieben werden.	
 	@Override
 	public String getColumnName(int colIndex)
 	{

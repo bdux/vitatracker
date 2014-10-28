@@ -8,6 +8,7 @@ import java.io.File;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -15,6 +16,8 @@ import java.util.LinkedList;
 import javax.jws.Oneway;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.text.TabExpander;
 
 import vitaTracker.dataHandler.WindowTableModel;
 import vitaTracker.Util.*;
@@ -40,7 +43,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private ValueField			tfVal1, tfVal2;
 	
 	private JTable				messungTabelle;
-	private WindowTableModel	wTableModel;
+	private JScrollPane 		tableScroll;
+//	private WindowTableModel	wTableModel;
 	private String[]			strArrmessArten, strMessUnits, tableColumnNames;
 	private Date				dateMessung;
 	private Calendar			calDateMess;
@@ -49,7 +53,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private URL 				iconURL;
 	private DateTimePicker 		dtp;
 	private Messung 			m;
-	private LinkedList<Object> messungen = new LinkedList<Object>();
+	private LinkedList<Messung>	messungen;
 	private Object[][]			objArrTable;
 	private File				file = new File("user.home");
 	private StatusBar			statusBar;
@@ -67,23 +71,34 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	public MainWindow()
 	{
-		
 		initializeComponents();
+		initData();
+		
 		
 	}
 	
 	private void Show()
 	{
-		
-		
+				
 		this.setVisible(true);
 		initFrame();
-	
+		
 	}
+	
+	private void initData()
+	{
+		
+		
+		
+	}
+	
+	
 	
 	private void initFrame()
 	{
-		
+		messungTabelle.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+		messungTabelle.repaint();
+		this.pack();
 	}
 	
 	/*
@@ -110,30 +125,19 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		ImageIcon icon = new ImageIcon(iconURL);
 		this.setIconImage(icon.getImage());
 		this.setTitle("VitaTracker");
-
 		
 		tableColumnNames = new String[] {"Messungsart", "Wert", "Einheit", "Messzeitpunkt"};
-//		objArrTable = new Object[1][tableColumnNames.length];
-		messungen.add(0, tableColumnNames);
-		objArrTable = new Object[messungen.size()][((String[])(messungen.getFirst())).length];
+		
+		messungen = new LinkedList<Messung>();
+				
+		objArrTable = new Object[messungen.size()+1][tableColumnNames.length];  
 		
 		
-		//füllen des objArr
-		for(int i = 0; i < tableColumnNames.length;i++)
-		{
-			objArrTable[0][i] = tableColumnNames[i];
-			System.out.println(objArrTable[0][i]);
-		}
-		
-		wTableModel = new WindowTableModel(objArrTable);
-		messungTabelle = new JTable(wTableModel);
-		messungTabelle.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-		
-		
-		JScrollPane tableScroll = new JScrollPane(messungTabelle);
+//		wTableModel= new WindowTableModel(objArrTable);
+		messungTabelle = new JTable(objArrTable, tableColumnNames);
+
+		tableScroll = new JScrollPane(messungTabelle);
 		this.add(tableScroll, FrameLayout.CENTER);
-		
-		
 		
 		strArrmessArten = new String[] {"Blutdruck","Blutzucker","Gewicht"};
 		strMessUnits = new String[] {"mmHg","Kg","lbs","mmol/L","mg/dL"};
@@ -237,6 +241,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		miExit = WinUtil.createMenuItem(datei, "Beenden", WinUtil.MenuItemType.ITEM_PLAIN, this, "Beenden", null, 'N', null);
 		this.setJMenuBar(menuBar);
 		
+//		addTableEntry();
+
+		
 		setUIEntries(cBoxMessArten.getSelectedIndex());
 		this.pack();
 	}
@@ -336,40 +343,51 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 
 	private void addTableEntry(int row)
 	{
+		
 				
-		if (messWasCreated)
-		{
-//			if (row<=objArrTable.length && row >-1)
-//			{
-//				objArrTable[row][0] = messungen.get(row).getStrMessArt();
-//				
-//				if (cBoxMessArten.getSelectedIndex() == BLUTDRUCK)
-//				{	objArrTable[row][1] = messungen.get(row).getValueAtIndex(0) + " / " + messungen.get(row).getValueAtIndex(1);
-//				} else	{	objArrTable[row][1] = messungen.get(row).getValueAtIndex(0); }
-//				
-//				objArrTable[row][2] = cBoxMsngUnit.getSelectedItem().toString();
-//				objArrTable[row][3] = sDForm.format(messungen.get(row).getDate());
-//				
-//				messungTabelle.repaint();
-//			}
-//			else
-//			{
-//				Object[][] temp = objArrTable.clone();
-//				objArrTable = new Object[temp.length+10][4];
-//				System.arraycopy(temp, 0, objArrTable, 0, temp.length);
-//				temp = null;			
-//				
-//			}
-//		
-			objArrTable = null;
-			objArrTable = new Object[messungen.size()][((String[])(messungen.getFirst())).length];
-			messungTabelle = null;
-			messungTabelle = new JTable(wTableModel);
+		if (row <= messungen.size())
+		{	
+			objArrTable[row][0] = messungen.get(row).getStrMessArt();
+			objArrTable[row][1] = messungen.get(row).getValueAtIndex(0);			
+			objArrTable[row][2] = strMessUnits[cBoxMsngUnit.getSelectedIndex()];
+			objArrTable[row][3] = messungen.get(row).getDate();
 			messungTabelle.repaint();
+				
 		}
+		
+		else
+			
+		{
+			extendMessArray(objArrTable);
+			objArrTable[row][0] = messungen.get(row).getStrMessArt();
+			objArrTable[row][1] = messungen.get(row).getValueAtIndex(0);			
+			objArrTable[row][2] = strMessUnits[cBoxMsngUnit.getSelectedIndex()];
+			objArrTable[row][3] = messungen.get(row).getDate();
+			messungTabelle.repaint();
+			
+		}
+
+	}
+
+
+		
+	private void extendMessArray(Object[][] in)
+	{
+		int l = in.length;
+		
+		Object[][] newArray = new Object[in.length+1][tableColumnNames.length];
+		System.arraycopy(in, 0, newArray, 0, l+1);
+		
+//		for(int i=0; i < 30; i++)
+//			Arrays.fill(myArray[i], "");
+
+		in = Arrays.copyOf(newArray, l+1);
+		objArrTable = in;
 		
 		
 	}
+	
+	
 	
 	public void erzeugeMessung()
 	{
@@ -394,9 +412,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 					tfVal1.setText("");
 					tfVal2.setText("");
 					messWasCreated = true;
-					btnMessAdd.setEnabled(false);
 					statusBar.setText("Bereit");
 					}
+					
 					else
 					statusBar.setText("Der systolische Wert muss grösser als der Diastolische sein.");
 					
@@ -442,16 +460,15 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		{
 			statusBar.setText(e.getMessage());
 		} 
-		finally
-		{
+		
 			
-			if (messWasCreated)
-			{	
-				addMessung(m);
-				addTableEntry(messungen.size()-1);
-				messWasCreated = false;		
-			}
+		if (messWasCreated)
+		{	
+			addMessung(m);
+			addTableEntry(messungen.size()-1);
+			messWasCreated = false;		
 		}
+	
 		
 	}
 	
@@ -459,11 +476,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	private void addMessung(Messung m)
 	{
-		if (m != null)
-		{
+		
 			messungen.add(m);
-			
-		}
 		
 	}
 
