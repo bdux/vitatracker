@@ -1,4 +1,4 @@
-package vitaTracker.dataHandler;
+package vitaTracker;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;

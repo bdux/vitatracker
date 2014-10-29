@@ -11,7 +11,7 @@ import java.util.Calendar;
 
 import javax.swing.*;
 
-import vitaTracker.userInterface.MainWindow;
+import vitaTracker.MainWindow;
 
 
 /*

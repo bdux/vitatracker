@@ -1,4 +1,4 @@
-package vitaTracker.userInterface;
+package vitaTracker;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -19,10 +19,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.TabExpander;
 
-import vitaTracker.dataHandler.WindowTableModel;
+import vitaTracker.Messung.messArtEnum;
 import vitaTracker.Util.*;
-import vitaTracker.dataHandler.messungen.Messung;
-import vitaTracker.dataHandler.messungen.Messung.messArtEnum;
 
 /**
  * 
@@ -73,7 +71,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	{
 		initializeComponents();
 		initData();
-		
+
 		
 	}
 	
@@ -87,9 +85,29 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	private void initData()
 	{
+		objArrTable = new Object[messungen.size()+1][tableColumnNames.length];
+		//Tableheader im Array vorbereiten
+		for (int i=0;i<tableColumnNames.length;i++)
+			objArrTable[0][i] = tableColumnNames[i];
+		updateTableData();
 		
+	}
+	
+	private void updateTableData()
+	{	
+				
+//		for (int j=0;j<objArrTable.length;j++)
+//		{	
+//			for(int k = 0;k<tableColumnNames.length;k++)
+//			{
+//				System.out.println("objArr["+j+"]["+k+"]: " + objArrTable[j][k]);
+//			}
+//		}
+//		
 		
-		
+		wTableModel = null;
+		wTableModel = new WindowTableModel(objArrTable);
+		messungTabelle.setModel(wTableModel);
 	}
 	
 	
@@ -129,15 +147,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		tableColumnNames = new String[] {"Messungsart", "Wert", "Einheit", "Messzeitpunkt"};
 		
 		messungen = new LinkedList<Messung>();
-				
-		objArrTable = new Object[messungen.size()+1][tableColumnNames.length];  
 		
-		for (int i=0;i<tableColumnNames.length;i++)
-			objArrTable[0][i] = tableColumnNames[i];
-		
-		wTableModel= new WindowTableModel(objArrTable);
-//		messungTabelle = new JTable(wTableModel);
-		messungTabelle = new JTable(new WindowTableModel(objArrTable));
+
+		messungTabelle = new JTable();
 		tableScroll = new JScrollPane(messungTabelle);
 		this.add(tableScroll, FrameLayout.CENTER);
 		
@@ -346,24 +358,22 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private void addTableEntry(int row)
 	{
 		
-		if (row<=objArrTable.length && row >-1)
-		{
-			objArrTable[row][0] = messungen.get(row).getStrMessArt();
-			
-			if (cBoxMessArten.getSelectedIndex() == BLUTDRUCK)
-			{	objArrTable[row][1] = messungen.get(row).getValueAtIndex(0) + " / " + messungen.get(row).getValueAtIndex(1);
-			} else	{	objArrTable[row][1] = messungen.get(row).getValueAtIndex(0); }
-			
-			objArrTable[row][2] = cBoxMsngUnit.getSelectedItem().toString();
-			objArrTable[row][3] = sDForm.format(messungen.get(row).getDate());
-			
-			messungTabelle.setModel(new WindowTableModel(objArrTable));
+		extendMessArray(objArrTable);
+		objArrTable[row][0] = messungen.get(row).getStrMessArt();
+		
+		if (cBoxMessArten.getSelectedIndex() == BLUTDRUCK)
+		{	
+			objArrTable[row][1] = messungen.getFirst().getValueAtIndex(0) + " / " + messungen.getFirst().getValueAtIndex(1);
+		} 
+		else	
+		{	
+			objArrTable[row][1] = messungen.getFirst().getValueAtIndex(0);
 		}
-		else
-		{
-			extendMessArray(objArrTable);
-			
-		}
+		
+		objArrTable[row][2] = cBoxMsngUnit.getSelectedItem().toString();
+		objArrTable[row][3] = sDForm.format(messungen.getFirst().getDate());
+		
+		updateTableData();
 				
 	}
 		
@@ -375,16 +385,15 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 	private void extendMessArray(Object[][] in)
 	{
-		int l = in.length;
+		int sourceLength= in.length;
 		
-		Object[][] newArray = new Object[in.length+1][tableColumnNames.length];
-		System.arraycopy(in, 0, newArray, 0, l+1);
-		
-//		for(int i=0; i < 30; i++)
-//			Arrays.fill(myArray[i], "");
+		Object[][] newArray = new Object[sourceLength+1][tableColumnNames.length];
+		System.arraycopy(in,0,newArray,0,sourceLength);
 
-		in = Arrays.copyOf(newArray, l+1);
-		objArrTable = in;
+
+		objArrTable = new Object[sourceLength+1][tableColumnNames.length];
+		objArrTable = Arrays.copyOf(newArray, in.length+2);
+		
 		
 		
 	}
@@ -467,7 +476,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		if (messWasCreated)
 		{	
 			addMessung(m);
-			addTableEntry(messungen.size()-1);
+			System.out.println(messungen.size());
+			addTableEntry(messungen.size());
 			messWasCreated = false;		
 		}
 	

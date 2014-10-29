@@ -1,4 +1,4 @@
-package vitaTracker.userInterface;
+package vitaTracker;
 
 import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;

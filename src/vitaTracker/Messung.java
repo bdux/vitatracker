@@ -1,4 +1,4 @@
-package vitaTracker.dataHandler.messungen;
+package vitaTracker;
 
 import java.util.Date;
 
