@@ -83,35 +83,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 	}
 	
-	private void initData()
-	{
-		objArrTable = new Object[messungen.size()+1][tableColumnNames.length];
-		//Tableheader im Array vorbereiten
-		for (int i=0;i<tableColumnNames.length;i++)
-			objArrTable[0][i] = tableColumnNames[i];
-		updateTableData();
-		
-	}
-	
-	private void updateTableData()
-	{	
-				
-//		for (int j=0;j<objArrTable.length;j++)
-//		{	
-//			for(int k = 0;k<tableColumnNames.length;k++)
-//			{
-//				System.out.println("objArr["+j+"]["+k+"]: " + objArrTable[j][k]);
-//			}
-//		}
-//		
-		
-		wTableModel = null;
-		wTableModel = new WindowTableModel(objArrTable);
-		messungTabelle.setModel(wTableModel);
-	}
-	
-	
-	
 	private void initFrame()
 	{
 		messungTabelle.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
@@ -355,23 +326,49 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 	}
 
+	private void initData()
+	{
+		objArrTable = new Object[messungen.size()+1][tableColumnNames.length];
+		//Tableheader im Array vorbereiten
+		for (int i=0;i<tableColumnNames.length;i++)
+			objArrTable[0][i] = tableColumnNames[i];
+		updateTableData();
+		
+	}
+
+	private void updateTableData()
+		{	
+					
+	//		for (int j=0;j<objArrTable.length;j++)
+	//		{	
+	//			for(int k = 0;k<tableColumnNames.length;k++)
+	//			{
+	//				System.out.println("objArr["+j+"]["+k+"]: " + objArrTable[j][k]);
+	//			}
+	//		}
+	//		
+			
+			wTableModel = new WindowTableModel(objArrTable);
+			messungTabelle.setModel(wTableModel);
+		}
+
 	private void addTableEntry(int row)
 	{
 		
 		extendMessArray(objArrTable);
-		objArrTable[row][0] = messungen.get(row).getStrMessArt();
+		objArrTable[row][0] = messungen.getLast().getStrMessArt();
 		
 		if (cBoxMessArten.getSelectedIndex() == BLUTDRUCK)
 		{	
-			objArrTable[row][1] = messungen.getFirst().getValueAtIndex(0) + " / " + messungen.getFirst().getValueAtIndex(1);
+			objArrTable[row][1] = messungen.getLast().getValueAtIndex(0) + " / " + messungen.getLast().getValueAtIndex(1);
 		} 
 		else	
 		{	
-			objArrTable[row][1] = messungen.getFirst().getValueAtIndex(0);
+			objArrTable[row][1] = messungen.getLast().getValueAtIndex(0);
 		}
 		
 		objArrTable[row][2] = cBoxMsngUnit.getSelectedItem().toString();
-		objArrTable[row][3] = sDForm.format(messungen.getFirst().getDate());
+		objArrTable[row][3] = sDForm.format(messungen.getLast().getDate());
 		
 		updateTableData();
 				
@@ -389,11 +386,12 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		Object[][] newArray = new Object[sourceLength+1][tableColumnNames.length];
 		System.arraycopy(in,0,newArray,0,sourceLength);
-
+		
 
 		objArrTable = new Object[sourceLength+1][tableColumnNames.length];
-		objArrTable = Arrays.copyOf(newArray, in.length+2);
+		objArrTable = Arrays.copyOf(newArray, in.length+1);
 		
+		System.out.println(objArrTable);
 		
 		
 	}
