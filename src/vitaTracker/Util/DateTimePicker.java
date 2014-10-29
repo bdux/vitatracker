@@ -193,7 +193,7 @@ public class DateTimePicker extends JFrame implements ActionListener, WindowList
 			
 		}
 		
-		textFieldsToString();
+//		textFieldsToString();
 		
 	}
 

@@ -30,13 +30,13 @@ import vitaTracker.Util.*;
 public class MainWindow extends JFrame implements ActionListener, WindowListener, ItemListener
 {
 
-	private JPanel 				chartPanel, eingabePanel, eingabeInnerPanel, headPanel,pnlBtnFootPanel;
+	private JPanel 				pnChart, pnEingabe, pnEingabeInner, pnHeadPanel,pnBtnFoot, pnFilter;
 	private JButton				btnFelderLoeschen, btnDatenHolen,btnMessZeitSetzen, btnMessCommit;
 	private JButton				btnMessAdd;
 	private JMenuBar 			menuBar;
 	private JMenu 				datei, extras;
 	private JMenuItem 			miLoad, miSave, miExit;
-	private JLabel				lblVal1, lblVal2, /*glucoVal, gewichtVal*/ messZeit, lblUnit;
+	private JLabel				lblVal1, lblVal2, /*glucoVal, gewichtVal*/ messZeit, lblUnit,lblFilterSelect;
 	private JTextField			/*tfVal1, tfVal2 tfGlucoVal, tfGewichtVal*/ tfMessZeit;
 	private ValueField			tfVal1, tfVal2;
 	
@@ -47,7 +47,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private Date				dateMessung;
 	private Calendar			calDateMess;
 	private SimpleDateFormat	sDForm;
-	private JComboBox<String> 	cBoxMessArten,cBoxMsngUnit;
+	private JComboBox<String> 	cBoxMessArten,cBoxMsngUnit,cbMessFilter;
 	private URL 				iconURL;
 	private DateTimePicker 		dtp;
 	private Messung 			m;
@@ -56,7 +56,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private File				file = new File("user.home");
 	private StatusBar			statusBar;
 	private BorderLayout		FrameLayout, ePBl, hPBl;
-	private GridLayout			bFPl;
+	private GridLayout			bFPl, flterPl;
 	
 	
 	private boolean messWasCreated = false;
@@ -95,9 +95,10 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	 */
 	private void initializeComponents()
 	{
-		ePBl = new BorderLayout(5, 5);
-		hPBl = new BorderLayout(2, 2);
-		bFPl = new GridLayout(0, 1);
+		ePBl 		= new BorderLayout(5, 5);
+		hPBl 		= new BorderLayout(2, 2);
+		bFPl		= new GridLayout(0, 1);
+		flterPl		= new GridLayout(1, 0);
 		FrameLayout = new BorderLayout();
 		
 		
@@ -133,90 +134,107 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		statusBar.setMessage("Bereit");
 		this.add(statusBar, FrameLayout.PAGE_END);
 		
-		eingabePanel = new JPanel();
-		eingabePanel.setLayout(ePBl);
-		eingabePanel.setPreferredSize(new Dimension(200,250));
-		eingabePanel.setBackground(Color.LIGHT_GRAY);
-		this.add(eingabePanel, FrameLayout.LINE_START);
+		pnEingabe = new JPanel();
+		pnEingabe.setLayout(ePBl);
+		pnEingabe.setPreferredSize(new Dimension(200,250));
+		pnEingabe.setBackground(Color.LIGHT_GRAY);
+		this.add(pnEingabe, FrameLayout.LINE_START);
 		
-		eingabeInnerPanel = new JPanel();
-		eingabeInnerPanel.setLayout(null);
-		eingabeInnerPanel.setPreferredSize(new Dimension(200,250));
-		eingabeInnerPanel.setBackground(eingabePanel.getBackground());
-		eingabePanel.add(eingabeInnerPanel, ePBl.CENTER);
+		pnEingabeInner = new JPanel();
+		pnEingabeInner.setLayout(null);
+		pnEingabeInner.setPreferredSize(new Dimension(200,250));
+		pnEingabeInner.setBackground(pnEingabe.getBackground());
+		pnEingabe.add(pnEingabeInner, ePBl.CENTER);
 		
-		pnlBtnFootPanel = new JPanel();
-		pnlBtnFootPanel.setLayout(bFPl);
-		pnlBtnFootPanel.setBackground(eingabePanel.getBackground());
-		eingabePanel.add(pnlBtnFootPanel, ePBl.PAGE_END);
+		pnBtnFoot = new JPanel();
+		pnBtnFoot.setLayout(bFPl);
+		pnBtnFoot.setBackground(pnEingabe.getBackground());
+		pnEingabe.add(pnBtnFoot, ePBl.PAGE_END);
 		
-		headPanel = new JPanel();
-		headPanel.setBackground(eingabePanel.getBackground());
-		headPanel.setLayout(hPBl);
-		this.add(headPanel, FrameLayout.PAGE_START);
+		pnHeadPanel = new JPanel();
+		pnHeadPanel.setBackground(pnEingabe.getBackground());
+		pnHeadPanel.setLayout(hPBl);
+		this.add(pnHeadPanel, FrameLayout.PAGE_START);
+		
+		pnFilter = new JPanel();
+		pnFilter.setLayout(flterPl);
+		pnFilter.setBackground(pnHeadPanel.getBackground());
+		pnHeadPanel.add(pnFilter, hPBl.LINE_END);
+
+//		lblUnit = new JLabel("Einheit: ");
+//		lblUnit.setPreferredSize(new Dimension(200, 25));
+//		pnFilter.add(lblUnit);
+		
+		lblFilterSelect = new JLabel("Filtern nach: ");
+		lblFilterSelect.setPreferredSize(new Dimension(200, 25));
+		pnFilter.add(lblFilterSelect);
+		
 		
 		cBoxMessArten = new JComboBox<String>(strArrmessArten);
 		cBoxMessArten.setSelectedItem(strArrmessArten[DEFAULT_SELECTION]);
 		cBoxMessArten.setPreferredSize(new Dimension(200,25));
 		cBoxMessArten.addItemListener(this);
-		headPanel.add(cBoxMessArten, hPBl.LINE_START);
+		pnHeadPanel.add(cBoxMessArten, hPBl.LINE_START);
 		
+		cbMessFilter = new JComboBox<String>();
+		for (int i = 0;i<strArrmessArten.length;i++)
+			cbMessFilter.addItem(strArrmessArten[i]);
+		cbMessFilter.addItem("Alle");
+		cbMessFilter.setSelectedItem("Alle");
+		pnFilter.add(cbMessFilter);
 		
 		cBoxMsngUnit = new JComboBox<String>();
-		cBoxMsngUnit.setPreferredSize(new Dimension(100,25));
+		cBoxMsngUnit.setPreferredSize(new Dimension(50,25));
 		cBoxMsngUnit.addItemListener(this);
-		headPanel.add(cBoxMsngUnit, hPBl.LINE_END);
+		pnHeadPanel.add(cBoxMsngUnit, hPBl.CENTER);
 	
 		
-		lblUnit = new JLabel("Einheit: ");
-		lblUnit.setPreferredSize(new Dimension(200, 25));
-		headPanel.add(lblUnit, hPBl.CENTER);
 				
 		lblVal1 = new JLabel("Systolischer Wert");
 		lblVal1.setBounds(15, 15, 150, 25);
-		eingabeInnerPanel.add(lblVal1);
+		pnEingabeInner.add(lblVal1);
 		
 		
 
 		tfVal1 = new ValueField(this);
 		tfVal1.setBounds(15, 35, 75, 25);
-		eingabeInnerPanel.add(tfVal1);
+		pnEingabeInner.add(tfVal1);
 		
 		lblVal2 = new JLabel("Diastolischer Wert");
 		lblVal2.setBounds(15, 70, 150, 25);
-		eingabeInnerPanel.add(lblVal2);
+		pnEingabeInner.add(lblVal2);
 
 		
 		
 		tfVal2 = new ValueField(this);
 		tfVal2.setBounds(15,90,75,25);
-		eingabeInnerPanel.add(tfVal2);
+		pnEingabeInner.add(tfVal2);
 		
 		messZeit = new JLabel("Messzeitpunkt: ");
 		messZeit.setBounds(15, 155, 150, 25);
-		eingabeInnerPanel.add(messZeit);
+		pnEingabeInner.add(messZeit);
 				
 		tfMessZeit = new JTextField(sDForm.format(dateMessung).toString());
 		tfMessZeit.setBounds(15, 180, 150, 25);
 		tfMessZeit.setEnabled(false);
-		eingabeInnerPanel.add(tfMessZeit);
+		pnEingabeInner.add(tfMessZeit);
 		
 		btnMessZeitSetzen = new JButton(">");
 		btnMessZeitSetzen.setFont(btnMessZeitSetzen.getFont().deriveFont(Font.PLAIN));
 		btnMessZeitSetzen.setMargin(null);
 		btnMessZeitSetzen.setBounds(170, 180 , 25, 25);
 		btnMessZeitSetzen.addActionListener(this);
-		eingabeInnerPanel.add(btnMessZeitSetzen);
+		pnEingabeInner.add(btnMessZeitSetzen);
 
 		btnMessAdd = new JButton("Messung hinzufügen");
 		btnMessAdd.addActionListener(this);
 		btnMessAdd.setEnabled(true);
-		pnlBtnFootPanel.add(btnMessAdd);
+		pnBtnFoot.add(btnMessAdd);
 		
 		btnMessCommit = new JButton("Messungen Sichern");
 		btnMessCommit.addActionListener(this);
 		btnMessCommit.setEnabled(false);
-		pnlBtnFootPanel.add(btnMessCommit);
+		pnBtnFoot.add(btnMessCommit);
 		
 		menuBar = new JMenuBar();
 		datei = WinUtil.createMenu(menuBar, "Datei", "menuName", 'D');
@@ -226,7 +244,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		miExit = WinUtil.createMenuItem(datei, "Beenden", WinUtil.MenuItemType.ITEM_PLAIN, this, "Beenden", null, 'N', null);
 		this.setJMenuBar(menuBar);
 		
-//		addTableEntry();
+
 
 		
 		setUIEntries(cBoxMessArten.getSelectedIndex());
@@ -391,7 +409,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		objArrTable = new Object[sourceLength+1][tableColumnNames.length];
 		objArrTable = Arrays.copyOf(newArray, in.length+1);
 		
-		System.out.println(objArrTable);
+	
 		
 		
 	}
@@ -474,7 +492,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		if (messWasCreated)
 		{	
 			addMessung(m);
-			System.out.println(messungen.size());
 			addTableEntry(messungen.size());
 			messWasCreated = false;		
 		}
