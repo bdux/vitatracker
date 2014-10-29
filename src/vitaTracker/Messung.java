@@ -8,6 +8,7 @@ public class Messung
 	private double[] wert = {0,0};
 	private String messArtStr = null;
 	public static enum messArtEnum {blutDruck, gewicht, blutZucker};
+	private int mID = -1;
 	
 	public Messung()
 	{
@@ -44,6 +45,7 @@ public class Messung
 		this.wert[0] = value1;
 		this.wert[1] = value2;
 		this.messArtStr = "Blutdruck";
+		this.mID = MainWindow.BLUTDRUCK;
 		}
 		
 		if (art == messArtEnum.blutZucker)
@@ -52,6 +54,7 @@ public class Messung
 		this.wert[0] = value1;
 		this.wert[1] = 0;
 		this.messArtStr = "Glucose";
+		this.mID = MainWindow.BLUTZUCKER;
 		}
 		
 		
@@ -61,12 +64,10 @@ public class Messung
 		this.wert[0] = value1;
 		this.wert[1] = 0;
 		this.messArtStr = "Gewicht";
+		this.mID = MainWindow.GEWICHT;
 		}
 		
-		
-		
-		
-		
+				
 	}
 	
 	public Date getDate()
@@ -84,6 +85,11 @@ public class Messung
 		
 		return messArtStr;
 		
+	}
+
+	public int getmID()
+	{
+		return mID;
 	}
 
 

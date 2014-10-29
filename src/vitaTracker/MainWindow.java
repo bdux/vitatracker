@@ -9,9 +9,12 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
+
+import javax.jws.Oneway;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableRowSorter;
+
 import vitaTracker.Messung.messArtEnum;
 import vitaTracker.Util.*;
 
@@ -65,6 +68,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 							DEFAULT_SELECTION = GEWICHT, BP_UNIT = 0, WEIGHT_METRIC = 1, 
 							WEIGHT_IMPERIAL = 2, GLUCO_MOL = 3, GLUCO_MG = 4;
 	
+	
+	
 	public MainWindow()
 	{
 		initializeComponents();
@@ -93,7 +98,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	 */
 	private void initializeComponents()
 	{
-		blEgPnl 			= new BorderLayout(5, 5);
+		blEgPnl 		= new BorderLayout(5, 5);
 		blHdPn 			= new BorderLayout(2, 2);
 		blPnHdPnlLnSt	= new BorderLayout();
 		blFltrPn		= new GridLayout(0, 1);
@@ -234,7 +239,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		btnMessZeitSetzen.addActionListener(this);
 		pnEingabeInner.add(btnMessZeitSetzen);
 
-		btnMessAdd = new JButton("Messung hinzufï¿½gen");
+		btnMessAdd = new JButton("Messung hinzufügen");
 		btnMessAdd.addActionListener(this);
 		btnMessAdd.setEnabled(true);
 		pnBtnFoot.add(btnMessAdd);
@@ -244,7 +249,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		btnMessCommit.setEnabled(false);
 		pnBtnFoot.add(btnMessCommit);
 		
-		//Menï¿½leiste
+		//Menüleiste
 		menuBar = new JMenuBar();
 		datei = WinUtil.createMenu(menuBar, "Datei", "menuName", 'D');
 		extras = WinUtil.createMenu(menuBar, "Extras", "Extras", 'X');
@@ -265,9 +270,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	
 	/**
-	 * ï¿½ndert die Ansicht fï¿½r das Eingabepanel entsprechend der auswahl der cBoxMessArten
+	 * Ändert die Ansicht für das Eingabepanel entsprechend der auswahl der cBoxMessArten
 	 * <br></br>
-	 * @param int messung: Integer Wert zur ï¿½bergabe and das Messeinheiten Array 
+	 * @param int messung: Integer Wert zur Übergabe and das Messeinheiten Array 
 	 * 
 	 */
 	
@@ -333,7 +338,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		fc.setFileFilter(new FileNameExtensionFilter("Textdateien (*.txt)", "txt"));
 		fc.setAcceptAllFileFilterUsed(false);
-		fc.setDialogTitle("Textdatei AuswÃ¤hlen");
+		fc.setDialogTitle("Textdatei Auswählen");
 		
 		
 		fc.setCurrentDirectory(file);
@@ -395,25 +400,74 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 	
 		
-	private void filterTable(String string)
+	private Object[][] filterTable(Object[][] in)
 	{
+				
+		int sourceHeader = in[0].length;
+		int sourceLength= in.length;
+		int messID = -1;
 		
+		switch (cbMessFilter.getSelectedItem().toString())
+		{
+			case "Blutzucker":
+				
+				messID = BLUTZUCKER;
+				
+				break;
+	
+			case "Blutdruck":
+				
+				messID = BLUTDRUCK;
+				
+				break;
+				
+			case "Gewicht":
+				
+				messID = GEWICHT;
+				
+				break;
+			case "Alle":
+				return objArrTable;
+				
+		}
+		
+		
+		try
+		{
+			Object[][] newArray = new Object[sourceLength+1][sourceHeader];
+			
+			for(int i = 0; i<=liLiMessungen.size();i++)
+			{
+				if(liLiMessungen.get(i).getmID() == messID )
+				System.arraycopy(in,i,newArray,i,sourceLength);
+			}
+
+			objArrTable = new Object[sourceLength+1][sourceHeader];
+			objArrTable = Arrays.copyOf(newArray, in.length+1);
+			
+			
+			return objArrTable;
+			
+		} catch (Exception e)
+		{
+			setStatusBarText("nichts zu filtern...");
+		}
+		
+		return objArrTable;
 	}
 
 	private void extendMessArray(Object[][] in)
 	{
+		int sourceHeader = in[0].length;
 		int sourceLength= in.length;
 		
-		Object[][] newArray = new Object[sourceLength+1][strArrtableColNames.length];
+		Object[][] newArray = new Object[sourceLength+1][sourceHeader];
 		System.arraycopy(in,0,newArray,0,sourceLength);
 		
 
-		objArrTable = new Object[sourceLength+1][strArrtableColNames.length];
+		objArrTable = new Object[sourceLength+1][sourceHeader];
 		objArrTable = Arrays.copyOf(newArray, in.length+1);
-		
-	
-		
-		
+			
 	}
 	
 	
@@ -494,7 +548,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		} 
 		catch (Exception e)
 		{
-			sbStaBarMainWin.setText("Ungï¿½ltige Eingabe");
+			sbStaBarMainWin.setText("Ungültige Eingabe");
 		} 
 		
 			
@@ -579,7 +633,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		}
 		else if(o == cbMessFilter)
 		{
-			filterTable(cbMessFilter.getSelectedItem().toString());
+			filterTable(objArrTable);
 		}
 		
 		
