@@ -77,10 +77,10 @@ public class DateTimePicker extends JFrame implements ActionListener, WindowList
 		this.setPreferredSize(new Dimension(240,75));
 		
 		
-		ImageIcon imageIconUp = new ImageIcon(getClass().getResource("up.png"));
+		ImageIcon imageIconUp = new ImageIcon(getClass().getResource("/resource/up.png"));
 		imageIconUp.setImage(imageIconUp.getImage().getScaledInstance(35, 25, Image.SCALE_AREA_AVERAGING));
 		
-		ImageIcon imageIconDown = new ImageIcon(getClass().getResource("down.png"));
+		ImageIcon imageIconDown = new ImageIcon(getClass().getResource("/resource/down.png"));
 		imageIconDown.setImage(imageIconDown.getImage().getScaledInstance(35, 25, Image.SCALE_AREA_AVERAGING));
 		
 		for (int i = 0; i<6; i++)
