@@ -2,19 +2,28 @@ package vitaTracker;
 
 import java.util.Date;
 
+
+/**
+ * 
+ * Klasse Messung, dient zum erstellen von Objekten des Typs Messung, zur weiteren Verarbeitung 
+ * in der MainWindow Klasse.
+ * 
+ * @author Benjamin Dux
+ * 
+ *
+ */
 public class Messung
 {
-	private Date zp;
-	private double[] wert = {0,0};
-	private String messArtStr;
-	private String messUnit;
-	public static enum messArtEnum {blutDruck, gewicht, blutZucker};
 	private int mID = -1;
+	private double[] wert = {0,0};
+	private Date zp;
+	private String messArtStr, messUnit;
+	public static enum messArtEnum {blutDruck, gewicht, blutZucker};
 	
 	private Messung() {}
 		
 	/**
-	 * Konstruktor der zum Bauen einer Messung genutzt werden sollte!
+	 * Konstruktor der zum Bauen eines Messungsobjekts.
 	 * @param date Date; Zeitpunkt der Messung
 	 * @param value1 double; Erster Wert, bei allen Messungen außer Blutdruck das einzige zu setzende Meßfeld
 	 * @param value2 double; nur für den diastolischen Wert verwendet
@@ -56,26 +65,51 @@ public class Messung
 		}
 	}
 	
+	
+	/**
+	 * 
+	 * @return gibt den Zeitpunkt der Messung zurück
+	 */
 	public Date getDate()
 	{
 		return zp;
 	}
 	
+	/**
+	 * gibt den Wert der Messung zurück. Zu beachten ist hier, dass man zwar einen int übergibt, die Messwerte
+	 * aber als double vorliegen - und zwar in einem double[]. val ist hier der index des zu holenden Messwerts.
+	 * wert[1] wird nur im Falle einer Blutdruckmessung gebraucht.
+	 * @param val double Messwert am index val.
+	 * @return
+	 */
 	public double getValueAtIndex(int val)
 	{
 		return wert[val];
 	}
 	
+	
+	/**
+	 * 
+	 * @return gibt den Klarnamen der Messart zurück.
+	 */
 	public String getStrMessArt()
 	{
 		return messArtStr;
 	}
 
+	/**
+	 * 
+	 * @return gibt den Messungsschlüssel der Messung zurück. Siehe MainWindow.
+	 */
 	public int getmID()
 	{
 		return mID;
 	}
 
+	/**
+	 * 
+	 * @return gibt die Einheit der Messung zurück.
+	 */
 	public String getMessUnit()
 	{
 		return messUnit;

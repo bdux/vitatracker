@@ -181,7 +181,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		pnHeadPanel.add(pnHdPnlLnSt, blHdPn.LINE_START);
 		
 		cBoxMessArten 		= new JComboBox<String>(strArrmessArten);
-//		cBoxMessArten.setSelectedItem(strArrmessArten[DEFAULT_SELECTION]);
 		cBoxMessArten.setSelectedItem(M_STR_GEWICHT);
 		cBoxMessArten.setPreferredSize(new Dimension(125,25));
 		cBoxMessArten.addItemListener(this);
@@ -206,8 +205,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		lblVal1 			= new JLabel("Systolischer Wert");
 		lblVal1.setBounds(15, 15, 150, 25);
 		pnEingabeInner.add(lblVal1);
-		
-		
 
 		tfVal1 				= new ValueField(this);
 		tfVal1.setBounds(15, 35, 75, 25);
@@ -216,8 +213,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		lblVal2 			= new JLabel("Diastolischer Wert");
 		lblVal2.setBounds(15, 70, 150, 25);
 		pnEingabeInner.add(lblVal2);
-
-		
 		
 		tfVal2				= new ValueField(this);
 		tfVal2.setBounds(15,90,75,25);
@@ -259,10 +254,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		miExit = WinUtil.createMenuItem(datei, "Beenden", WinUtil.MenuItemType.ITEM_PLAIN, this, "Beenden", null, 'N', null);
 		miEval = WinUtil.createMenuItem(extras, "Auswertung", WinUtil.MenuItemType.ITEM_PLAIN, this, "Auswertung", null, 'W',null);
 		this.setJMenuBar(menuBar);
-		
-
-
-		
+			
 		setUIEntries(cBoxMessArten.getSelectedIndex());
 		this.pack();
 	}
@@ -356,90 +348,90 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		return retValue;
 	}
 
+	
+	/**
+	 * 
+	 * anlegen eines neuen Object[][] zur Weitergabe an das WindowTableModel,
+	 * erste Spalte bekommt die Strings für den Tabellenheader.
+	 */
 	private void initData()
 	{
 		objArrTable = new Object[liLiMessungen.size()+1][strArrtableColNames.length];
 		//Tableheader im Array vorbereiten
 		for (int i=0;i<strArrtableColNames.length;i++)
 			objArrTable[0][i] = strArrtableColNames[i];
-		updateTableData(/*objArrTable*/);
+		updateTableData(objArrTable);
 		
 	}
-
-	private void updateTableData(/*Object[][] source*/)
+	
+	
+	/**
+	 * 
+	 * @param source das Object[][] das als Grundlage des WindowTableModels genutzt werden soll
+	 */
+	private void updateTableData(Object[][] source)
 	{	
 		tmWTableModel = new WindowTableModel(/*source*/objArrTable);
 		tblMessung.setModel(tmWTableModel);
 	}
 
-	private void addTableEntry(int row)
+	private void addTableEntry()
+	{
+		extendMessArray(objArrTable);
+		updateTableData(fillObjArray(liLiMessungen, objArrTable));
+	
+	}
+	
+	/**
+	 * 
+	 * Befüllt ein Object[][] mit Attributen von Messungsobjekten, die in einer LinkedList vorgehalten werden.
+	 * 
+	 * @param src die LinkedList<Messung>() als Quelle für die Daten
+	 * @param target das Object[][] als Ziel
+	 * @return das befüllte Object[][]
+	 */
+	private Object[][] fillObjArray(LinkedList<Messung> src, Object[][]target)
 	{
 		
-		extendMessArray(objArrTable);
+		int row = src.size();
+	
+		target[row][0] = src.getLast().getStrMessArt();
 		
-//		fillObjArray(liLiMessungen, objArrTable);
-		objArrTable[row][0] = liLiMessungen.getLast().getStrMessArt();
-		
-		if (cBoxMessArten.getSelectedIndex() == BLUTDRUCK)
+		if (src.getLast().getmID() == BLUTDRUCK)
 		{	
-			objArrTable[row][1] = liLiMessungen.getLast().getValueAtIndex(0) + " / " + liLiMessungen.getLast().getValueAtIndex(1);
+			target[row][1] = src.getLast().getValueAtIndex(0) + " / " + src.getLast().getValueAtIndex(1);
 		} 
 		else	
 		{	
-			objArrTable[row][1] = liLiMessungen.getLast().getValueAtIndex(0);
+			target[row][1] = src.getLast().getValueAtIndex(0);
 		}
 		
-		objArrTable[row][2] = cBoxMsngUnit.getSelectedItem().toString();
-		objArrTable[row][3] = sDForm.format(liLiMessungen.getLast().getDate());
+		target[row][2] = src.getLast().getMessUnit();
+		target[row][3] = sDForm.format(src.getLast().getDate());
 		
-		updateTableData(/*fillObjArray(liLiMessungen, objArrTable)*/);
-				
+		
+		return target;
 	}
 	
-	private Object[][] fillObjArray(LinkedList<Messung> src, Object[][]target)
-	{
-		Object[][] output = target;
-		
-		int row;
-		LinkedList<Messung> source = src;
-		
-		for (row = 0; row<src.size();row++)
-		{	
-			target[row][0] = src.getLast().getStrMessArt();
-			
-			if (src.get(row).getmID() == BLUTDRUCK)
-			{	
-				target[row][1] = src.getLast().getValueAtIndex(0) + " / " + src.getLast().getValueAtIndex(1);
-			} 
-			else	
-			{	
-				target[row][1] = src.getLast().getValueAtIndex(0);
-			}
-			
-			target[row][2] = src.get(row).getMessUnit();
-			target[row][3] = sDForm.format(src.getLast().getDate());
-		}
-		
-		objArrTable = output;
-		return objArrTable;
-	}
+	//	
 	
-		
+	
+	/**
+	 * 
+	 * 
+	 * @param in das zu Filternde Object[][]
+	 * @return das Object[][] das neben dem Header für die Tabelle nur noch die Messungsobjekte mit der gesuchten mID haben
+	 */
 	private Object[][] filterTable(Object[][] in)
 	{
-		
-		
 		int sourceHeader = in[0].length;
 		int sourceLength= in.length;
 		int targetLength = 0;
 		int messID = -1;
 		int filterOccurence = 0;
+		String filterSelection = cbMessFilter.getSelectedItem().toString();
 		
-		
-		
-		
-		
-		switch (cbMessFilter.getSelectedItem().toString())
+		switch (filterSelection)
 		{
 			case M_STR_BLUTZUCKER:
 				
@@ -460,16 +452,21 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 				break;
 			case M_STR_ALLE:
 				setStatusBarText("Bereit");
-				return objArrTable;
-				
+				updateTableData(in);
+				return in;
 		}
 		
-
-		for(int i = 0;i<sourceLength;i++)
+//		for(int i = 0;i<liLiMessungen.size();i++)
+//		{
+//			if (liLiMessungen.get(i).getmID() == messID )
+//				filterOccurence++;
+//		}
+		
+		
+		for (Messung m:liLiMessungen)
 		{
-			if (liLiMessungen.get(i).getmID() == messID )
+			if (m.getmID() == messID)
 				filterOccurence++;
-						
 		}
 		
 		targetLength = filterOccurence;
@@ -478,30 +475,37 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		{
 			Object[][] newArray = new Object[targetLength][sourceHeader];
 			
-			for(int i = 0; i<=liLiMessungen.size();i++)
+//			System.arraycopy(in, 0, newArray, 0, targetLength);
+			for(Messung m:liLiMessungen)
 			{
-				if(liLiMessungen.get(i).getmID() == messID )
+				if(m.getmID() == messID )
 				{
-					System.arraycopy(in,i,newArray,i,sourceLength);
+					System.arraycopy(in,0,newArray,0,targetLength);
 //					newArray[i][0] = liLiMessungen.get(i);
 				}
 			}
 
-			objArrTable = new Object[targetLength][sourceHeader];
-			objArrTable = Arrays.copyOf(newArray, in.length+1);
+			in = new Object[targetLength][sourceHeader];
+			in = Arrays.copyOf(newArray, in.length+1);
 			
-			
-			return objArrTable;
+			updateTableData(newArray);
+			return newArray;
 			
 		} 
 		catch (Exception e)
 		{
 			setStatusBarText("nichts zu filtern...");
+			return objArrTable;
 		}
 		
-		return objArrTable;
+		
 	}
 
+	/**
+	 * Erweitert ein übergenes Object[][]
+	 * @param das zu erweiternde Object[][]
+	 */
+	
 	private void extendMessArray(Object[][] in)
 	{
 		int sourceHeader = in[0].length;
@@ -513,16 +517,13 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 
 		objArrTable = new Object[sourceLength+1][sourceHeader];
 		objArrTable = Arrays.copyOf(newArray, in.length+1);
-			
+//		in = new Object[sourceLength+1][sourceHeader];
+//		in = Arrays.copyOf(newArray, in.length+1);
 	}
 	
-	private void addMessung(Messung m)
+	private void createMessung()
 	{
-		liLiMessungen.add(m);
-	}
-
-	private void erzeugeMessung()
-	{
+		
 		try
 		{
 			switch (cBoxMessArten.getSelectedIndex()) 
@@ -587,12 +588,17 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			
 		if (messWasCreated)
 		{	
-			addMessung(mObjMessung);
-			addTableEntry(liLiMessungen.size());
+			addMessungToLinkedList(mObjMessung);
+			addTableEntry(/*liLiMessungen.size()*/);
 			messWasCreated = false;		
 		}
 	}
 	
+	private void addMessungToLinkedList(Messung m)
+	{
+		liLiMessungen.add(m);
+	}
+
 	public Date getDateMessung()
 	{			
 		return dateMessung;
@@ -634,7 +640,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			dtpDaTime = new DateTimePicker(this);
 		
 		else if (o == btnMessAdd)
-				erzeugeMessung();		
+				createMessung();		
 		
 		else if (o == miLoad)
 			dateiLesen();
@@ -678,14 +684,12 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			filterTable(objArrTable);
 		}
 		
-		
 	}
 	
 	public static void main(String[] args)
 		{
 			MainWindow mw = new MainWindow();
 			mw.Show();
-		
 		}
 	
 	
