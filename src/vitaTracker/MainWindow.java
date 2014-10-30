@@ -79,7 +79,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 //							GLUCO_MG;
 	
 	
-	private final String M_STR_BLUTDRUCK = "Blutdruck", M_STR_BLUTZUCKER = "Blutzucker", M_STR_GEWICHT = "Gewicht";
+	private final String M_STR_BLUTDRUCK = "Blutdruck", M_STR_BLUTZUCKER = "Blutzucker", M_STR_GEWICHT = "Gewicht", M_STR_ALLE = "Alle";
 	private final String UN_STR_BP_UNIT = "mmHg", UN_WEIGHT_METRIC = "Kg", UN_WEIGHT_IMPERIAL = "lbs", UN_GLUCO_MOL = "mmol/L", UN_GLUCO_MG = "mg/DL";
 	private final String COL_NAME_MESSART = "Messungsart", COL_NAME_VALUE = "Wert", COL_NAME_UNIT = "Einheit", COL_NAME_TIME = "Messzeitpunkt";
 	
@@ -139,87 +139,85 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		this.setResizable(true);
 		
-		urlIconURL = getClass().getResource("/resource/120px-Health-stub.gif");
-		ImageIcon icon = new ImageIcon(urlIconURL);
+		urlIconURL 			= getClass().getResource("/resource/120px-Health-stub.gif");
+		ImageIcon icon 		= new ImageIcon(urlIconURL);
 		this.setIconImage(icon.getImage());
 		this.setTitle("VitaTracker");
 		
 		strArrtableColNames = new String[] {COL_NAME_MESSART, COL_NAME_VALUE, COL_NAME_UNIT, COL_NAME_TIME};
-		strArrmessArten = new String[] {M_STR_BLUTDRUCK,M_STR_BLUTZUCKER,M_STR_GEWICHT};
-		strArrMessUnits = new String[] {UN_STR_BP_UNIT,UN_WEIGHT_METRIC,UN_WEIGHT_IMPERIAL,UN_GLUCO_MOL,UN_GLUCO_MG};
-		dateMessung = new Date(System.currentTimeMillis());
-		sDForm = new SimpleDateFormat("dd.MM.yyyy, HH:mm:ss");
+		strArrmessArten 	= new String[] {M_STR_BLUTDRUCK,M_STR_BLUTZUCKER,M_STR_GEWICHT};
+		strArrMessUnits 	= new String[] {UN_STR_BP_UNIT,UN_WEIGHT_METRIC,UN_WEIGHT_IMPERIAL,UN_GLUCO_MOL,UN_GLUCO_MG};
+		dateMessung			= new Date(System.currentTimeMillis());
+		sDForm 				= new SimpleDateFormat("dd.MM.yyyy, HH:mm:ss");
 		
 		
 		
-		liLiMessungen = new LinkedList<Messung>();
+		liLiMessungen 		= new LinkedList<Messung>();
 		
-		tblMessung = new JTable();
+		tblMessung 			= new JTable();
 		tblMessung.setAutoCreateRowSorter(true);
-		scrpTableScroll = new JScrollPane(tblMessung);
+		scrpTableScroll 	= new JScrollPane(tblMessung);
 		
 		this.add(scrpTableScroll, blFrameLayout.CENTER);
 		
-		sbStaBarMainWin = new StatusBar();
+		sbStaBarMainWin		= new StatusBar();
 		sbStaBarMainWin.setMessage("Bereit");
 		this.add(sbStaBarMainWin, blFrameLayout.PAGE_END);
 		
-		pnEingabe = new JPanel();
+		pnEingabe 			= new JPanel();
 		pnEingabe.setLayout(blEgPnl);
 		pnEingabe.setPreferredSize(new Dimension(200,250));
 		pnEingabe.setBackground(Color.LIGHT_GRAY);
 		this.add(pnEingabe, blFrameLayout.LINE_START);
 		
-		pnEingabeInner = new JPanel();
+		pnEingabeInner 		= new JPanel();
 		pnEingabeInner.setLayout(null);
 		pnEingabeInner.setPreferredSize(new Dimension(200,250));
 		pnEingabeInner.setBackground(pnEingabe.getBackground());
 		pnEingabe.add(pnEingabeInner, blEgPnl.CENTER);
 		
-		pnBtnFoot = new JPanel();
+		pnBtnFoot			 = new JPanel();
 		pnBtnFoot.setLayout(blFltrPn);
 		pnBtnFoot.setBackground(pnEingabe.getBackground());
 		pnEingabe.add(pnBtnFoot, blEgPnl.PAGE_END);
 		
-		pnHeadPanel = new JPanel();
+		pnHeadPanel 		= new JPanel();
 		pnHeadPanel.setBackground(pnEingabe.getBackground());
 		pnHeadPanel.setLayout(blHdPn);
 		this.add(pnHeadPanel, blFrameLayout.PAGE_START);
 		
-		pnFilter = new JPanel();
+		pnFilter 			= new JPanel();
 		pnFilter.setLayout(blFlterPl);
 		pnFilter.setBackground(pnHeadPanel.getBackground());
 		pnHeadPanel.add(pnFilter, blHdPn.LINE_END);
 
 
 		
-		lblFilterSelect = new JLabel("Filtern nach: ");
+		lblFilterSelect 	= new JLabel("Filtern nach: ");
 		lblFilterSelect.setPreferredSize(new Dimension(200, 25));
 		pnFilter.add(lblFilterSelect);
 		
 		// Line Start im pnHeadPanel
 		
-		pnHdPnlLnSt = new JPanel();
+		pnHdPnlLnSt 		= new JPanel();
 		pnHdPnlLnSt.setLayout(blPnHdPnlLnSt);
 		pnHdPnlLnSt.setPreferredSize(new Dimension(200,25));
 		pnHeadPanel.add(pnHdPnlLnSt, blHdPn.LINE_START);
 		
-		cBoxMessArten = new JComboBox<String>(strArrmessArten);
+		cBoxMessArten 		= new JComboBox<String>(strArrmessArten);
 //		cBoxMessArten.setSelectedItem(strArrmessArten[DEFAULT_SELECTION]);
 		cBoxMessArten.setSelectedItem(M_STR_GEWICHT);
 		cBoxMessArten.setPreferredSize(new Dimension(125,25));
 		cBoxMessArten.addItemListener(this);
 		pnHdPnlLnSt.add(cBoxMessArten, blPnHdPnlLnSt.LINE_START);
 		
-		cbMessFilter = new JComboBox<String>();
-		for (int i = 0;i<strArrmessArten.length;i++)
-			cbMessFilter.addItem(strArrmessArten[i]);
-		cbMessFilter.addItem("Alle");
-		cbMessFilter.setSelectedItem("Alle");
+		cbMessFilter 		= new JComboBox<String>(strArrmessArten);
+		cbMessFilter.addItem(M_STR_ALLE);
+		cbMessFilter.setSelectedItem(M_STR_ALLE);
 		cbMessFilter.addItemListener(this);
 		pnFilter.add(cbMessFilter);
 		
-		cBoxMsngUnit = new JComboBox<String>();
+		cBoxMsngUnit 		= new JComboBox<String>();
 		cBoxMsngUnit.setPreferredSize(new Dimension(75,25));
 		cBoxMsngUnit.addItemListener(this);
 		pnHdPnlLnSt.add(cBoxMsngUnit, blPnHdPnlLnSt.LINE_END);
@@ -229,27 +227,27 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 		// Eingabepanel
 		
-		lblVal1 = new JLabel("Systolischer Wert");
+		lblVal1 			= new JLabel("Systolischer Wert");
 		lblVal1.setBounds(15, 15, 150, 25);
 		pnEingabeInner.add(lblVal1);
 		
 		
 
-		tfVal1 = new ValueField(this);
+		tfVal1 				= new ValueField(this);
 		tfVal1.setBounds(15, 35, 75, 25);
 		pnEingabeInner.add(tfVal1);
 		
-		lblVal2 = new JLabel("Diastolischer Wert");
+		lblVal2 			= new JLabel("Diastolischer Wert");
 		lblVal2.setBounds(15, 70, 150, 25);
 		pnEingabeInner.add(lblVal2);
 
 		
 		
-		tfVal2 = new ValueField(this);
+		tfVal2				= new ValueField(this);
 		tfVal2.setBounds(15,90,75,25);
 		pnEingabeInner.add(tfVal2);
 		
-		lblMessZeit = new JLabel("Messzeitpunkt: ");
+		lblMessZeit 		= new JLabel("Messzeitpunkt: ");
 		lblMessZeit.setBounds(15, 155, 150, 25);
 		pnEingabeInner.add(lblMessZeit);
 				
@@ -258,33 +256,32 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		tfMessZeit.setEnabled(false);
 		pnEingabeInner.add(tfMessZeit);
 		
-		btnMessZeitSetzen = new JButton(">");
+		btnMessZeitSetzen 	= new JButton(">");
 		btnMessZeitSetzen.setFont(btnMessZeitSetzen.getFont().deriveFont(Font.PLAIN));
 		btnMessZeitSetzen.setMargin(null);
 		btnMessZeitSetzen.setBounds(170, 180 , 25, 25);
 		btnMessZeitSetzen.addActionListener(this);
 		pnEingabeInner.add(btnMessZeitSetzen);
 
-		btnMessAdd = new JButton("Messung hinzufügen");
+		btnMessAdd 			= new JButton("Messung hinzufügen");
 		btnMessAdd.addActionListener(this);
 		btnMessAdd.setEnabled(true);
 		pnBtnFoot.add(btnMessAdd);
 		
-		btnMessCommit = new JButton("Messungen Sichern");
+		btnMessCommit 		= new JButton("Messungen Sichern");
 		btnMessCommit.addActionListener(this);
 		btnMessCommit.setEnabled(false);
 		pnBtnFoot.add(btnMessCommit);
 		
 		//Menüleiste
-		menuBar = new JMenuBar();
+		menuBar 			= new JMenuBar();
 		datei = WinUtil.createMenu(menuBar, "Datei", "menuName", 'D');
 		extras = WinUtil.createMenu(menuBar, "Extras", "Extras", 'X');
 		
 		miLoad = WinUtil.createMenuItem(datei, "Laden", WinUtil.MenuItemType.ITEM_PLAIN, this, "Laden", null, 'L', null);
 		miSave = WinUtil.createMenuItem(datei, "Speichern", WinUtil.MenuItemType.ITEM_PLAIN, this, "Speichern", null, 'A', null);
 		miExit = WinUtil.createMenuItem(datei, "Beenden", WinUtil.MenuItemType.ITEM_PLAIN, this, "Beenden", null, 'N', null);
-		miEval = WinUtil.createMenuItem(extras, "Auswertung", WinUtil.MenuItemType.ITEM_PLAIN, this, 
-				"Auswertung", null, 'W',null);
+		miEval = WinUtil.createMenuItem(extras, "Auswertung", WinUtil.MenuItemType.ITEM_PLAIN, this, "Auswertung", null, 'W',null);
 		this.setJMenuBar(menuBar);
 		
 
@@ -294,23 +291,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		this.pack();
 	}
 	
-	
-	/**
-	 * Ändert die Ansicht für das Eingabepanel entsprechend der auswahl der cBoxMessArten
-	 * <br></br>
-	 * @param int messung: Integer Wert zur Übergabe and das Messeinheiten Array 
-	 * 
-	 */
-	
-	public void setStatusBarText(String s)
-	{
-		sbStaBarMainWin.setText(s);		
-	}
-	
-	public void setbtnMessAddEnabledState( boolean bool)
-	{	
-		btnMessAdd.setEnabled(bool);
-	}
 	
 	private void setUIEntries(int messung)
 	{
@@ -384,6 +364,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 	}
 
+	//Wird nicht genutzt, aber vielleicht noch brauchbar
 	private int getArrayIndexOf(String[] arr, String s)
 	{
 		int retValue = -1;
@@ -446,24 +427,24 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		switch (cbMessFilter.getSelectedItem().toString())
 		{
-			case "Blutzucker":
+			case M_STR_BLUTZUCKER:
 				
 				messID = BLUTZUCKER;
 				
 				break;
 	
-			case "Blutdruck":
+			case M_STR_BLUTDRUCK:
 				
 				messID = BLUTDRUCK;
 				
 				break;
 				
-			case "Gewicht":
+			case M_STR_GEWICHT:
 				
 				messID = GEWICHT;
 				
 				break;
-			case "Alle":
+			case M_STR_ALLE:
 				setStatusBarText("Bereit");
 				return objArrTable;
 				
@@ -511,15 +492,11 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	private void addMessung(Messung m)
 	{
-		
-			liLiMessungen.add(m);
-		
+		liLiMessungen.add(m);
 	}
 
 	public void erzeugeMessung()
 	{
-		
-	
 		try
 		{
 			switch (cBoxMessArten.getSelectedIndex()) 
@@ -527,8 +504,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			
 			case BLUTDRUCK:
 				if (tfVal1.getText() != null && tfVal2.getText() != null)
-				{
-										
+				{					
 					if (Double.parseDouble(tfVal1.getText()) >= Double.parseDouble(tfVal2.getText()))
 					{
 					
@@ -543,11 +519,10 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 					}
 					
 					else
-					sbStaBarMainWin.setText("Der systolische Wert muss grï¿½sser als der Diastolische sein.");
-					
+					sbStaBarMainWin.setText("Der systolische Wert muss grösser als der Diastolische sein.");
 				}	
 				else
-					sbStaBarMainWin.setText("Messung kann nicht ï¿½bernommen werden.");
+					sbStaBarMainWin.setText("Messung kann nicht übernommen werden.");
 		
 				break;
 				
@@ -573,21 +548,16 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 							messArtEnum.gewicht);
 					tfVal1.setText("");
 					messWasCreated = true;
-							
 				}	
 				
 				break;
-				
 			}
-			
-			
 			
 		} 
 		catch (Exception e)
 		{
 			sbStaBarMainWin.setText("Ungültige Eingabe");
 		} 
-		
 			
 		if (messWasCreated)
 		{	
@@ -595,8 +565,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			addTableEntry(liLiMessungen.size());
 			messWasCreated = false;		
 		}
-	
-		
 	}
 	
 	public Date getDateMessung()
@@ -612,6 +580,23 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	/*die Listener-Methoden*/
 	
+	/**
+	 * Ändert die Ansicht für das Eingabepanel entsprechend der auswahl der cBoxMessArten
+	 * <br></br>
+	 * @param int messung: Integer Wert zur Übergabe and das Messeinheiten Array 
+	 * 
+	 */
+	
+	public void setStatusBarText(String s)
+	{
+		sbStaBarMainWin.setText(s);		
+	}
+
+	public void setbtnMessAddEnabledState( boolean bool)
+	{	
+		btnMessAdd.setEnabled(bool);
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
