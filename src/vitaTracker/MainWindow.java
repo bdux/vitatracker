@@ -375,6 +375,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		tblMessung.setModel(tmWTableModel);
 	}
 
+	/**
+	 * Hilfsmethode zum befüllen der JTable
+	 */
 	private void addTableEntry()
 	{
 		extendMessArray(objArrTable);
@@ -417,8 +420,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	
 	/**
-	 * 
-	 * 
 	 * @param in das zu Filternde Object[][]
 	 * @return das Object[][] das neben dem Header für die Tabelle nur noch die Messungsobjekte mit der gesuchten mID haben
 	 */
