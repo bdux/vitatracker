@@ -344,7 +344,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			if (searchArr[i] == s )
 				retValue = i;
 		}
-		
+	
 		return retValue;
 	}
 
@@ -521,6 +521,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 //		in = Arrays.copyOf(newArray, in.length+1);
 	}
 	
+	/**
+	 * erzeugt ein Messungsobjekt, unter Berücksichtigung des Ausgewählten indexes der cBoxMessArt.
+	 */
 	private void createMessung()
 	{
 		
@@ -594,6 +597,10 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		}
 	}
 	
+	/**
+	 * fügt ein Messungsobjekt zur LinkedList<Messung> liLiMessungen hinzu
+	 * @param m das hizuzufügende Messungsobjekt
+	 */
 	private void addMessungToLinkedList(Messung m)
 	{
 		liLiMessungen.add(m);
@@ -604,13 +611,16 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		return dateMessung;
 	}
 
+	/**
+	 * @deprecated
+	 * @param dateMessung die zu setzende Messzeit
+	 */
 	public void setDateMessung(Date dateMessung)
 	{
 		this.dateMessung = dateMessung;
 		tfMessZeit.setText(sDForm.format(dateMessung).toString());
 	}
 	
-	/*die Listener-Methoden*/
 	
 	/**
 	 * Ändert die Ansicht für das Eingabepanel entsprechend der auswahl der cBoxMessArten
@@ -619,16 +629,27 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	 * 
 	 */
 	
+	
+	/**
+	 * setzt den Text der Statusbar im Hauptfenster.
+	 * @param s der zu setzende Text.
+	 */
 	public void setStatusBarText(String s)
 	{
 		sbStaBarMainWin.setText(s);		
 	}
 
+	/**
+	 * @deprecated
+	 * @param bool HilfsKlasse zum Setzen des Enabled Status des btnMessAdd.
+	 */
 	public void setbtnMessAddEnabledState( boolean bool)
 	{	
 		btnMessAdd.setEnabled(bool);
 	}
 
+	/*die Listener-Methoden*/
+	
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
