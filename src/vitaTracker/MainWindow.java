@@ -366,7 +366,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	
 	/**
-	 * 
+	 * erzeugt ein neues WindowTableModel und setzt das WindowTableModel der tblMessung, was auch eine Neuzeichnung der Tabelle auslöst.
 	 * @param source das Object[][] das als Grundlage des WindowTableModels genutzt werden soll
 	 */
 	private void updateTableData(Object[][] source)
@@ -606,14 +606,18 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		liLiMessungen.add(m);
 	}
 
+	/**
+	 * 
+	 * @return das Date aus dateMessung.
+	 */
 	public Date getDateMessung()
 	{			
 		return dateMessung;
 	}
 
 	/**
-	 * @deprecated
-	 * @param dateMessung die zu setzende Messzeit
+	 * 
+	 * @param das zu setzende Messdatum, zur Übergabe an das tfMessZeit Textfeld.
 	 */
 	public void setDateMessung(Date dateMessung)
 	{
