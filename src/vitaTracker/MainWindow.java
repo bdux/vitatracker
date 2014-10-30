@@ -45,6 +45,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private JScrollPane 		scrpTableScroll;
 	private WindowTableModel	tmWTableModel;
 	private String[]			strArrmessArten, strArrMessUnits, strArrtableColNames;
+	private String				stBarDefault;
 	private Date				dateMessung;
 	private Calendar			calDateMess;
 	private SimpleDateFormat	sDForm;
@@ -58,7 +59,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private StatusBar			sbStaBarMainWin;
 	private BorderLayout		blFrameLayout, blEgPnl, blHdPn, blPnHdPnlLnSt;
 	private GridLayout			blFltrPn, blFlterPl;
-	private TableRowSorter<WindowTableModel> sorter;
 	
 	private boolean messWasCreated = false;
 
@@ -68,22 +68,45 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 							DEFAULT_SELECTION = GEWICHT, BP_UNIT = 0, WEIGHT_METRIC = 1, 
 							WEIGHT_IMPERIAL = 2, GLUCO_MOL = 3, GLUCO_MG = 4;
 	
+//	public static final int BLUTDRUCK, 
+//							BLUTZUCKER, 
+//							GEWICHT,
+//							DEFAULT_SELECTION = GEWICHT, 
+//							BP_UNIT, 
+//							WEIGHT_METRIC, 
+//							WEIGHT_IMPERIAL, 
+//							GLUCO_MOL, 
+//							GLUCO_MG;
+	
+	
+	private final String M_STR_BLUTDRUCK = "Blutdruck", M_STR_BLUTZUCKER = "Blutzucker", M_STR_GEWICHT = "Gewicht";
+	private final String UN_STR_BP_UNIT = "mmHg", UN_WEIGHT_METRIC = "Kg", UN_WEIGHT_IMPERIAL = "lbs", UN_GLUCO_MOL = "mmol/L", UN_GLUCO_MG = "mg/DL";
+	private final String COL_NAME_MESSART = "Messungsart", COL_NAME_VALUE = "Wert", COL_NAME_UNIT = "Einheit", COL_NAME_TIME = "Messzeitpunkt";
 	
 	
 	public MainWindow()
 	{
 		initializeComponents();
+		
+//		this.BLUTDRUCK = getArrayIndexOf(strArrmessArten, M_STR_BLUTDRUCK);
+//		this.BLUTZUCKER = getArrayIndexOf(strArrmessArten, M_STR_BLUTZUCKER);
+//		this.GEWICHT = getArrayIndexOf(strArrmessArten, M_STR_GEWICHT);
+//		this.BP_UNIT = getArrayIndexOf(strArrMessUnits, UN_STR_BP_UNIT);
+//		this.WEIGHT_METRIC = getArrayIndexOf(strArrMessUnits, UN_WEIGHT_METRIC);
+//		this.WEIGHT_IMPERIAL = getArrayIndexOf(strArrMessUnits, UN_WEIGHT_IMPERIAL);
+//		this.GLUCO_MOL = getArrayIndexOf(strArrMessUnits, UN_GLUCO_MOL);
+//		this.GLUCO_MG = getArrayIndexOf(strArrMessUnits, UN_GLUCO_MG);
+//		
+		
 		initData();
 
 		
 	}
 	
 	private void Show()
-	{
-				
+	{			
 		this.setVisible(true);
 		initFrame();
-		
 	}
 	
 	private void initFrame()
@@ -121,12 +144,14 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		this.setIconImage(icon.getImage());
 		this.setTitle("VitaTracker");
 		
-		strArrtableColNames = new String[] {"Messungsart", "Wert", "Einheit", "Messzeitpunkt"};
-		strArrmessArten = new String[] {"Blutdruck","Blutzucker","Gewicht"};
-		strArrMessUnits = new String[] {"mmHg","Kg","lbs","mmol/L","mg/dL"};
+		strArrtableColNames = new String[] {COL_NAME_MESSART, COL_NAME_VALUE, COL_NAME_UNIT, COL_NAME_TIME};
+		strArrmessArten = new String[] {M_STR_BLUTDRUCK,M_STR_BLUTZUCKER,M_STR_GEWICHT};
+		strArrMessUnits = new String[] {UN_STR_BP_UNIT,UN_WEIGHT_METRIC,UN_WEIGHT_IMPERIAL,UN_GLUCO_MOL,UN_GLUCO_MG};
 		dateMessung = new Date(System.currentTimeMillis());
 		sDForm = new SimpleDateFormat("dd.MM.yyyy, HH:mm:ss");
-			
+		
+		
+		
 		liLiMessungen = new LinkedList<Messung>();
 		
 		tblMessung = new JTable();
@@ -180,7 +205,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		pnHeadPanel.add(pnHdPnlLnSt, blHdPn.LINE_START);
 		
 		cBoxMessArten = new JComboBox<String>(strArrmessArten);
-		cBoxMessArten.setSelectedItem(strArrmessArten[DEFAULT_SELECTION]);
+//		cBoxMessArten.setSelectedItem(strArrmessArten[DEFAULT_SELECTION]);
+		cBoxMessArten.setSelectedItem(M_STR_GEWICHT);
 		cBoxMessArten.setPreferredSize(new Dimension(125,25));
 		cBoxMessArten.addItemListener(this);
 		pnHdPnlLnSt.add(cBoxMessArten, blPnHdPnlLnSt.LINE_START);
@@ -282,10 +308,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 	
 	public void setbtnMessAddEnabledState( boolean bool)
-	{
-		
+	{	
 		btnMessAdd.setEnabled(bool);
-		
 	}
 	
 	private void setUIEntries(int messung)
@@ -345,9 +369,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		
 		if (fc.showOpenDialog(this) != JFileChooser.APPROVE_OPTION)
-			{
-				return;
-			}
+		{
+			return;
+		}
 		
 		fc.getSelectedFile();
 		
@@ -358,6 +382,21 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private void dateiLesenBufferedReader(String string) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	private int getArrayIndexOf(String[] arr, String s)
+	{
+		int retValue = -1;
+		String searchStr = s;
+		String[] searchArr = arr;
+		
+		for (int i = 0; i<searchArr.length;i++)
+		{
+			if (searchArr[i] == s )
+				retValue = i;
+		}
+		
+		return retValue;
 	}
 
 	private void initData()
@@ -371,10 +410,10 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 
 	private void updateTableData()
-		{	
-			tmWTableModel = new WindowTableModel(objArrTable);
-			tblMessung.setModel(tmWTableModel);
-		}
+	{	
+		tmWTableModel = new WindowTableModel(objArrTable);
+		tblMessung.setModel(tmWTableModel);
+	}
 
 	private void addTableEntry(int row)
 	{
@@ -397,8 +436,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		updateTableData();
 				
 	}
-		
-	
 		
 	private Object[][] filterTable(Object[][] in)
 	{
@@ -427,6 +464,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 				
 				break;
 			case "Alle":
+				setStatusBarText("Bereit");
 				return objArrTable;
 				
 		}
@@ -448,7 +486,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			
 			return objArrTable;
 			
-		} catch (Exception e)
+		} 
+		catch (Exception e)
 		{
 			setStatusBarText("nichts zu filtern...");
 		}
@@ -469,8 +508,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		objArrTable = Arrays.copyOf(newArray, in.length+1);
 			
 	}
-	
-	
 	
 	private void addMessung(Messung m)
 	{
@@ -562,11 +599,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 	}
 	
-	
-	
 	public Date getDateMessung()
-	{
-				
+	{			
 		return dateMessung;
 	}
 
@@ -593,8 +627,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		else if (o == miLoad)
 			dateiLesen();
-		
-		
 	}
 
 	@Override
@@ -607,7 +639,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	public void windowClosing(WindowEvent e)
 	{
 		this.dispose();
-		
 	}
 
 	@Override
@@ -645,7 +676,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			mw.Show();
 		
 		}
-
-
-
+	
+	
 }
