@@ -67,40 +67,16 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	public static final	int BLUTDRUCK = 0, BLUTZUCKER = 1, GEWICHT = 2,
 							DEFAULT_SELECTION = GEWICHT, BP_UNIT = 0, WEIGHT_METRIC = 1, 
 							WEIGHT_IMPERIAL = 2, GLUCO_MOL = 3, GLUCO_MG = 4;
-	
-//	public static final int BLUTDRUCK, 
-//							BLUTZUCKER, 
-//							GEWICHT,
-//							DEFAULT_SELECTION = GEWICHT, 
-//							BP_UNIT, 
-//							WEIGHT_METRIC, 
-//							WEIGHT_IMPERIAL, 
-//							GLUCO_MOL, 
-//							GLUCO_MG;
-	
-	
-	private final String M_STR_BLUTDRUCK = "Blutdruck", M_STR_BLUTZUCKER = "Blutzucker", M_STR_GEWICHT = "Gewicht", M_STR_ALLE = "Alle";
-	private final String UN_STR_BP_UNIT = "mmHg", UN_WEIGHT_METRIC = "Kg", UN_WEIGHT_IMPERIAL = "lbs", UN_GLUCO_MOL = "mmol/L", UN_GLUCO_MG = "mg/DL";
-	private final String COL_NAME_MESSART = "Messungsart", COL_NAME_VALUE = "Wert", COL_NAME_UNIT = "Einheit", COL_NAME_TIME = "Messzeitpunkt";
+
+	public static final String M_STR_BLUTDRUCK = "Blutdruck", M_STR_BLUTZUCKER = "Blutzucker", M_STR_GEWICHT = "Gewicht", M_STR_ALLE = "Alle";
+	public static final String UN_STR_BP_UNIT = "mmHg", UN_WEIGHT_METRIC = "Kg", UN_WEIGHT_IMPERIAL = "lbs", UN_GLUCO_MOL = "mmol/L", UN_GLUCO_MG = "mg/DL";
+	public static final String COL_NAME_MESSART = "Messungsart", COL_NAME_VALUE = "Wert", COL_NAME_UNIT = "Einheit", COL_NAME_TIME = "Messzeitpunkt";
 	
 	
 	public MainWindow()
 	{
 		initializeComponents();
-		
-//		this.BLUTDRUCK = getArrayIndexOf(strArrmessArten, M_STR_BLUTDRUCK);
-//		this.BLUTZUCKER = getArrayIndexOf(strArrmessArten, M_STR_BLUTZUCKER);
-//		this.GEWICHT = getArrayIndexOf(strArrmessArten, M_STR_GEWICHT);
-//		this.BP_UNIT = getArrayIndexOf(strArrMessUnits, UN_STR_BP_UNIT);
-//		this.WEIGHT_METRIC = getArrayIndexOf(strArrMessUnits, UN_WEIGHT_METRIC);
-//		this.WEIGHT_IMPERIAL = getArrayIndexOf(strArrMessUnits, UN_WEIGHT_IMPERIAL);
-//		this.GLUCO_MOL = getArrayIndexOf(strArrMessUnits, UN_GLUCO_MOL);
-//		this.GLUCO_MG = getArrayIndexOf(strArrMessUnits, UN_GLUCO_MG);
-//		
-		
 		initData();
-
-		
 	}
 	
 	private void Show()
@@ -386,13 +362,13 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		//Tableheader im Array vorbereiten
 		for (int i=0;i<strArrtableColNames.length;i++)
 			objArrTable[0][i] = strArrtableColNames[i];
-		updateTableData();
+		updateTableData(/*objArrTable*/);
 		
 	}
 
-	private void updateTableData()
+	private void updateTableData(/*Object[][] source*/)
 	{	
-		tmWTableModel = new WindowTableModel(objArrTable);
+		tmWTableModel = new WindowTableModel(/*source*/objArrTable);
 		tblMessung.setModel(tmWTableModel);
 	}
 
@@ -400,6 +376,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	{
 		
 		extendMessArray(objArrTable);
+		
+//		fillObjArray(liLiMessungen, objArrTable);
 		objArrTable[row][0] = liLiMessungen.getLast().getStrMessArt();
 		
 		if (cBoxMessArten.getSelectedIndex() == BLUTDRUCK)
@@ -414,16 +392,52 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		objArrTable[row][2] = cBoxMsngUnit.getSelectedItem().toString();
 		objArrTable[row][3] = sDForm.format(liLiMessungen.getLast().getDate());
 		
-		updateTableData();
+		updateTableData(/*fillObjArray(liLiMessungen, objArrTable)*/);
 				
 	}
+	
+	private Object[][] fillObjArray(LinkedList<Messung> src, Object[][]target)
+	{
+		Object[][] output = target;
+		
+		int row;
+		LinkedList<Messung> source = src;
+		
+		for (row = 0; row<src.size();row++)
+		{	
+			target[row][0] = src.getLast().getStrMessArt();
+			
+			if (src.get(row).getmID() == BLUTDRUCK)
+			{	
+				target[row][1] = src.getLast().getValueAtIndex(0) + " / " + src.getLast().getValueAtIndex(1);
+			} 
+			else	
+			{	
+				target[row][1] = src.getLast().getValueAtIndex(0);
+			}
+			
+			target[row][2] = src.get(row).getMessUnit();
+			target[row][3] = sDForm.format(src.getLast().getDate());
+		}
+		
+		objArrTable = output;
+		return objArrTable;
+	}
+	
 		
 	private Object[][] filterTable(Object[][] in)
 	{
-				
+		
+		
 		int sourceHeader = in[0].length;
 		int sourceLength= in.length;
+		int targetLength = 0;
 		int messID = -1;
+		int filterOccurence = 0;
+		
+		
+		
+		
 		
 		switch (cbMessFilter.getSelectedItem().toString())
 		{
@@ -450,18 +464,30 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 				
 		}
 		
+
+		for(int i = 0;i<sourceLength;i++)
+		{
+			if (liLiMessungen.get(i).getmID() == messID )
+				filterOccurence++;
+						
+		}
+		
+		targetLength = filterOccurence;
 		
 		try
 		{
-			Object[][] newArray = new Object[sourceLength+1][sourceHeader];
+			Object[][] newArray = new Object[targetLength][sourceHeader];
 			
 			for(int i = 0; i<=liLiMessungen.size();i++)
 			{
 				if(liLiMessungen.get(i).getmID() == messID )
-				System.arraycopy(in,i,newArray,i,sourceLength);
+				{
+					System.arraycopy(in,i,newArray,i,sourceLength);
+//					newArray[i][0] = liLiMessungen.get(i);
+				}
 			}
 
-			objArrTable = new Object[sourceLength+1][sourceHeader];
+			objArrTable = new Object[targetLength][sourceHeader];
 			objArrTable = Arrays.copyOf(newArray, in.length+1);
 			
 			
@@ -495,7 +521,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		liLiMessungen.add(m);
 	}
 
-	public void erzeugeMessung()
+	private void erzeugeMessung()
 	{
 		try
 		{
@@ -509,7 +535,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 					{
 					
 					this.mObjMessung = new Messung(this.getDateMessung(),Double.parseDouble(tfVal1.getText()),Double.parseDouble(tfVal2.getText()),
-					messArtEnum.blutDruck);
+					cBoxMsngUnit.getSelectedItem().toString() ,messArtEnum.blutDruck);
 					
 					
 					tfVal1.setText("");
@@ -531,7 +557,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 				if (tfVal1.getText() != null )
 				{
 					this.mObjMessung = new Messung(this.getDateMessung(),Double.parseDouble(tfVal1.getText()),
-							0,
+							0,cBoxMsngUnit.getSelectedItem().toString(),
 							messArtEnum.blutZucker);
 					tfVal1.setText("");
 					messWasCreated = true;
@@ -544,7 +570,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 				if (tfVal1.getText() != null )
 				{
 					this.mObjMessung = new Messung(this.getDateMessung(),Double.parseDouble(tfVal1.getText()),
-							0,
+							0,cBoxMsngUnit.getSelectedItem().toString(),
 							messArtEnum.gewicht);
 					tfVal1.setText("");
 					messWasCreated = true;

@@ -6,68 +6,54 @@ public class Messung
 {
 	private Date zp;
 	private double[] wert = {0,0};
-	private String messArtStr = null;
+	private String messArtStr;
+	private String messUnit;
 	public static enum messArtEnum {blutDruck, gewicht, blutZucker};
 	private int mID = -1;
 	
-	public Messung()
-	{
+	private Messung() {}
 		
-		this.zp = new Date(System.currentTimeMillis());
-//			this.wert[0] = 0.0;
-		
-	}
-	
-	public Messung (Date date, double value1, double value2)
+	/**
+	 * Konstruktor der zum Bauen einer Messung genutzt werden sollte!
+	 * @param date Date; Zeitpunkt der Messung
+	 * @param value1 double; Erster Wert, bei allen Messungen außer Blutdruck das einzige zu setzende Meßfeld
+	 * @param value2 double; nur für den diastolischen Wert verwendet
+	 * @param unit	String; Einheit der Messung
+	 * @param art	Enum; Art der Messung
+	 */
+	public Messung (Date date, double value1, double value2, String unit, messArtEnum art)
 	{
-		this();
-		this.zp = date;
-		this.wert[0] = value1;
-		this.wert[1] = value2;
-		
-	}
-	
-	public Messung (Date date, double value1)
-	{
-		this();
-		this.zp = date;
-		this.wert[0] = value1;
-		this.wert[1] = 0;
-		
-	}
-	
-	public Messung (Date date, double value1, double value2, messArtEnum art)
-	{
-		this();
+		this(); //eigentlich überflüssig... 
 		if (art == messArtEnum.blutDruck)
 		{
-		this.zp = date;
-		this.wert[0] = value1;
-		this.wert[1] = value2;
-		this.messArtStr = "Blutdruck";
-		this.mID = MainWindow.BLUTDRUCK;
+			this.zp = date;
+			this.wert[0] = value1;
+			this.wert[1] = value2;
+			this.messArtStr = MainWindow.M_STR_BLUTDRUCK;
+			this.messUnit = unit;
+			this.mID = MainWindow.BLUTDRUCK;
 		}
 		
 		if (art == messArtEnum.blutZucker)
 		{
-		this.zp = date;
-		this.wert[0] = value1;
-		this.wert[1] = 0;
-		this.messArtStr = "Glucose";
-		this.mID = MainWindow.BLUTZUCKER;
+			this.zp = date;
+			this.wert[0] = value1;
+			this.wert[1] = 0;
+			this.messArtStr = MainWindow.M_STR_BLUTZUCKER;
+			this.messUnit = unit;
+			this.mID = MainWindow.BLUTZUCKER;
 		}
 		
 		
 		if (art == messArtEnum.gewicht)
 		{
-		this.zp = date;
-		this.wert[0] = value1;
-		this.wert[1] = 0;
-		this.messArtStr = "Gewicht";
-		this.mID = MainWindow.GEWICHT;
+			this.zp = date;
+			this.wert[0] = value1;
+			this.wert[1] = 0;
+			this.messArtStr = MainWindow.M_STR_GEWICHT;
+			this.messUnit = unit;
+			this.mID = MainWindow.GEWICHT;
 		}
-		
-				
 	}
 	
 	public Date getDate()
@@ -82,9 +68,7 @@ public class Messung
 	
 	public String getStrMessArt()
 	{
-		
 		return messArtStr;
-		
 	}
 
 	public int getmID()
@@ -92,6 +76,9 @@ public class Messung
 		return mID;
 	}
 
-
+	public String getMessUnit()
+	{
+		return messUnit;
+	}
 	
 }
