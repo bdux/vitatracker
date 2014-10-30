@@ -92,7 +92,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		this.pack();
 	}
 	
-	/*
+	/**
 	 * initialisiert die Fensterkomponenten
 	 */
 	private void initializeComponents()
@@ -126,14 +126,12 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		dateMessung			= new Date(System.currentTimeMillis());
 		sDForm 				= new SimpleDateFormat("dd.MM.yyyy, HH:mm:ss");
 		
-		
-		
 		liLiMessungen 		= new LinkedList<Messung>();
 		
 		tblMessung 			= new JTable();
 		tblMessung.setAutoCreateRowSorter(true);
+	
 		scrpTableScroll 	= new JScrollPane(tblMessung);
-		
 		this.add(scrpTableScroll, blFrameLayout.CENTER);
 		
 		sbStaBarMainWin		= new StatusBar();
@@ -260,6 +258,12 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 	
 	
+	/**
+	 * Ändert die Ansicht für das Eingabepanel entsprechend der auswahl der cBoxMessArten
+	 * <br></br>
+	 * @param int messung: Integer Wert zur Übergabe and das Messeinheiten Array 
+	 * 
+	 */
 	private void setUIEntries(int messung)
 	{
 		cBoxMsngUnit.removeAllItems();
@@ -347,7 +351,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 		return retValue;
 	}
-
 	
 	/**
 	 * 
@@ -363,7 +366,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		updateTableData(objArrTable);
 		
 	}
-	
 	
 	/**
 	 * erzeugt ein neues WindowTableModel und setzt das WindowTableModel der tblMessung, was auch eine Neuzeichnung der Tabelle auslöst.
@@ -415,9 +417,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		return target;
 	}
-	
-	//	
-	
 	
 	/**
 	 * @param in das zu Filternde Object[][]
@@ -625,14 +624,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		this.dateMessung = dateMessung;
 		tfMessZeit.setText(sDForm.format(dateMessung).toString());
 	}
-	
-	
-	/**
-	 * Ändert die Ansicht für das Eingabepanel entsprechend der auswahl der cBoxMessArten
-	 * <br></br>
-	 * @param int messung: Integer Wert zur Übergabe and das Messeinheiten Array 
-	 * 
-	 */
 	
 	
 	/**
