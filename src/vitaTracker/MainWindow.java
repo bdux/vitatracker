@@ -57,8 +57,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private StatusBar			sbStaBarMainWin;
 	private BorderLayout		blFrameLayout, blEgPnl, blHdPn, blPnHdPnlLnSt;
 	private GridLayout			blFltrPn, blFlterPl;
-	private final String fileRead = System.getProperty("user.home") + "/Messungen.txt";
-	private final String fileSave = System.getProperty("user.home") + "/Messungen.txt";
+	private final String fileRead = "Messungen.txt";
+	private final String fileSave = "Messungen.txt";
 	private File				file = new File(fileRead);
 	
 	
@@ -383,6 +383,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		for (int i=0;i<strArrtableColNames.length;i++)
 			objArrTable[0][i] = strArrtableColNames[i];
 		updateTableData(objArrTable);
+		readData();
 		
 	}
 	
