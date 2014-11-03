@@ -782,8 +782,10 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			dtpDaTime = new DateTimePicker(this);
 		
 		else if (o == btnMessAdd)
-				createMessung();		
-		
+		{		
+			createMessung();
+			cbMessFilter.setSelectedItem(M_STR_ALLE);
+		}
 		else if (o == miLoad)
 			readData();
 		else if (o == miSave)
