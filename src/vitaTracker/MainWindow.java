@@ -19,7 +19,7 @@ import vitaTracker.Util.*;
 
 
 /**
- * Palim.
+ * 
  * @author Benjamin Dux
  *
  */
