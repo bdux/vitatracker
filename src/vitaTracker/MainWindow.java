@@ -393,7 +393,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	 */
 	private void updateTableData(Object[][] source)
 	{	
-		tmWTableModel = new WindowTableModel(/*source*/objArrTable);
+		tmWTableModel = new WindowTableModel(source);
 		tblMessung.setModel(tmWTableModel);
 	}
 
@@ -450,7 +450,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		int sourceLength= in.length;
 		int targetLength = 0;
 		int messID = -1;
-		int filterOccurence = 0;
+		int filterOccurence = 1;
+		int nextIndex = 1;
 		String filterSelection = cbMessFilter.getSelectedItem().toString();
 		
 		switch (filterSelection)
@@ -458,57 +459,52 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			case M_STR_BLUTZUCKER:
 				
 				messID = BLUTZUCKER;
-				
+				setStatusBarText("es wird nach Blutzuckerwerten gefiltert.");
 				break;
 	
 			case M_STR_BLUTDRUCK:
 				
 				messID = BLUTDRUCK;
-				
+				setStatusBarText("es wird nach Blutdruckwerten gefiltert.");
 				break;
 				
 			case M_STR_GEWICHT:
 				
 				messID = GEWICHT;
-				
+				setStatusBarText("es wird nach Gewichtswerten gefiltert.");
 				break;
 			case M_STR_ALLE:
 				setStatusBarText("Bereit");
-				updateTableData(in);
+				updateTableData(objArrTable);
 				return in;
 		}
 		
-//		for(int i = 0;i<liLiMessungen.size();i++)
-//		{
-//			if (liLiMessungen.get(i).getmID() == messID )
-//				filterOccurence++;
-//		}
-		
-		
-		for (Messung m:liLiMessungen)
-		{
-			if (m.getmID() == messID)
-				filterOccurence++;
-		}
-		
-		targetLength = filterOccurence;
-		
 		try
 		{
-			Object[][] newArray = new Object[targetLength][sourceHeader];
-			
-//			System.arraycopy(in, 0, newArray, 0, targetLength);
-			for(Messung m:liLiMessungen)
+			for (Messung m:liLiMessungen)
 			{
-				if(m.getmID() == messID )
+				if (m.getmID() == messID)
+					filterOccurence++;
+			}
+			
+			targetLength = filterOccurence;
+
+			Object[][] newArray = new Object[targetLength][sourceHeader];
+			System.arraycopy(in,0,newArray,0,targetLength);
+			
+			
+			for(int i = 0; i < sourceLength;i++)
+			{
+				if(in[i][0]  == filterSelection)
 				{
-					System.arraycopy(in,0,newArray,0,targetLength);
-//					newArray[i][0] = liLiMessungen.get(i);
+//					System.arraycopy(in,i,newArray,nextIndex,targetLength);
+					newArray[nextIndex][0]  = in[i][0];
+					newArray[nextIndex][1]  = in[i][1];
+					newArray[nextIndex][2]  = in[i][2];
+					newArray[nextIndex][3]  = in[i][3];
+					nextIndex++;
 				}
 			}
-
-			in = new Object[targetLength][sourceHeader];
-			in = Arrays.copyOf(newArray, in.length+1);
 			
 			updateTableData(newArray);
 			return newArray;
@@ -614,7 +610,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		if (messWasCreated)
 		{	
 			addMessungToLinkedList(mObjMessung);
-			addTableEntry(/*liLiMessungen.size()*/);
+			addTableEntry();
 			messWasCreated = false;		
 		}
 	}
@@ -631,26 +627,15 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private void saveData()
 		{
 			
-			
-	//		System.out.println( "saveData() " + fileSave );
-			
 			FileWriter fw = null;
 			
 			try
 			{
-				// Klasse 'FileWriter' zum schreiben von Text-Dateien
-				// optionaler Parameter: true = append, false = neu schreiben
-				//
 				fw = new FileWriter(fileSave, false);
 				
-				// durchlaufen der Linked List und in die Textdatei schreiben
-				//
 				for( Messung m : liLiMessungen )
 				{
 					fw.append(m.getNumericDate() + ";" + m.getValue1() + ";" + m.getValue2() + ";" + m.getMessUnit() + ";" +  m.getmID() +  System.lineSeparator());
-//							m.getStrMessArt()+ ";" + m.getValue1() + ";" + m.getValue2() + ";"+
-//							m.getMessUnit()+";" + m.getNumericDate() + System.lineSeparator() );
-					
 				}
 				
 				
@@ -668,12 +653,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 						ex.printStackTrace();
 					}
 			}
-			
 	}
 
-
-	
-	
 	/**
 	 * liest eine Textdatei ein und erzeugt Messungen aus semikolon-separierten Zeilen.
 	 */
@@ -683,50 +664,55 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		System.out.println( "loadData() " + fileSave );
 		
 		liLiMessungen.clear();
-//		NUMBER_OF_COMBI = 0;
 		Scanner in = null;
 		
 		try
 		{
 			in = new Scanner( new FileInputStream( fileSave ) );
 			
-			// gibt es eine weitere Zeile ?
-			//
 			while( in.hasNext() )
 			{
-				
 				String[] splitted = in.nextLine().split(";");
-				
-				
-				
+
 				switch (Integer.parseInt(splitted[4]))
 				{
 				case BLUTDRUCK:
-					this.mObjMessung = new Messung(new Date(Long.parseLong(splitted[0])),Double.parseDouble(splitted[1]),Double.parseDouble(splitted[2]),
-							splitted[3],messArtEnum.blutDruck);
+					this.mObjMessung = new Messung(
+							new Date(Long.parseLong(splitted[0])),
+							Double.parseDouble(splitted[1]),
+							Double.parseDouble(splitted[2]),
+							splitted[3],
+							messArtEnum.blutDruck);
 
 					addMessungToLinkedList(mObjMessung);
 					addTableEntry();
 					break;
 				
 				case BLUTZUCKER:
-					this.mObjMessung = new Messung(new Date(Long.parseLong(splitted[0])),Double.parseDouble(splitted[1]),Double.parseDouble(splitted[2]),
-							splitted[3],messArtEnum.blutZucker);
+					this.mObjMessung = new Messung(
+							new Date(Long.parseLong(splitted[0])),
+							Double.parseDouble(splitted[1]),
+							Double.parseDouble(splitted[2]),
+							splitted[3],
+							messArtEnum.blutZucker);
+					
 					addMessungToLinkedList(mObjMessung);
 					addTableEntry();
 					break;
 					
 				case GEWICHT:
-					this.mObjMessung = new Messung(new Date(Long.parseLong(splitted[0])),Double.parseDouble(splitted[1]),Double.parseDouble(splitted[2]),
+					this.mObjMessung = new Messung(
+							new Date(Long.parseLong(splitted[0])),
+							Double.parseDouble(splitted[1]),
+							Double.parseDouble(splitted[2]),
 							splitted[3] ,messArtEnum.gewicht);
+					
 					addMessungToLinkedList(mObjMessung);
 					addTableEntry();
 					break;
 
 				default:
 					break;
-					
-					
 				}
 				
 			}
@@ -834,7 +820,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		}
 		else if(o == cbMessFilter)
 		{
-			filterTable(objArrTable);
+			updateTableData(filterTable(objArrTable));
 		}
 		
 	}
