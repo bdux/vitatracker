@@ -3,18 +3,17 @@ package vitaTracker;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
-
-import javax.jws.Oneway;
+import java.util.Scanner;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.TableRowSorter;
-
 import vitaTracker.Messung.messArtEnum;
 import vitaTracker.Util.*;
 
@@ -55,10 +54,13 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private Messung 			mObjMessung;
 	private LinkedList<Messung>	liLiMessungen;
 	private Object[][]			objArrTable;
-	private File				file = new File("user.home");
 	private StatusBar			sbStaBarMainWin;
 	private BorderLayout		blFrameLayout, blEgPnl, blHdPn, blPnHdPnlLnSt;
 	private GridLayout			blFltrPn, blFlterPl;
+	private final String fileRead = System.getProperty("user.home") + "/Messungen.txt";
+	private final String fileSave = System.getProperty("user.home") + "/Messungen.txt";
+	private File				file = new File(fileRead);
+	
 	
 	private boolean messWasCreated = false;
 
@@ -307,33 +309,50 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 	}
 
-	private void dateiLesen()
+	
+	
+	public void datenLesenInArrays()
 	{
+		Scanner scanner = null;
+		String zeile;
 		
-		JFileChooser fc = new JFileChooser();
+		int colCounter = 0;
+		int rowCounter = 0;
 		
-		fc.setFileFilter(new FileNameExtensionFilter("Textdateien (*.txt)", "txt"));
-		fc.setAcceptAllFileFilterUsed(false);
-		fc.setDialogTitle("Textdatei Auswählen");
-		
-		
-		fc.setCurrentDirectory(file);
-		
-		
-		if (fc.showOpenDialog(this) != JFileChooser.APPROVE_OPTION)
-		{
-			return;
+		try 
+		{ 
+			for(int u = 0; u<=1; u++)
+			{
+				colCounter = 0;
+				
+				scanner = new Scanner( new FileInputStream(file) ); 
+				
+				while(scanner.hasNext())
+				{
+					zeile = scanner.nextLine();
+					String[] split = zeile.split(";");
+					
+					// System.out.println( "Zeile " + markenZaehler + " : " + zeile );
+					
+					if(u ==1 && !split[0].equals("#"))
+					{
+						objArrTable[0][colCounter] = split[0];
+						for(int i = 1; i < split.length; i++)
+							objArrTable[i][colCounter] = split[i];
+					}
+					
+					rowCounter = rowCounter < (split.length) ? split.length : rowCounter; 
+					colCounter ++;
+				}
+				
+				if(u == 0)
+					objArrTable = new String[rowCounter][colCounter];
+					
+				scanner.close();
+			}
 		}
-		
-		fc.getSelectedFile();
-		
+		catch (FileNotFoundException e) {}
 
-		dateiLesenBufferedReader(fc.getSelectedFile().toString());
-	}
-
-	private void dateiLesenBufferedReader(String string) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	//Wird nicht genutzt, aber vielleicht noch brauchbar
@@ -404,11 +423,11 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		if (src.getLast().getmID() == BLUTDRUCK)
 		{	
-			target[row][1] = src.getLast().getValueAtIndex(0) + " / " + src.getLast().getValueAtIndex(1);
+			target[row][1] = src.getLast().getValue1() + "/" + src.getLast().getValue2();
 		} 
 		else	
 		{	
-			target[row][1] = src.getLast().getValueAtIndex(0);
+			target[row][1] = src.getLast().getValue1();
 		}
 		
 		target[row][2] = src.getLast().getMessUnit();
@@ -424,6 +443,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	 */
 	private Object[][] filterTable(Object[][] in)
 	{
+		
+		//TODO : das ist noch nicht fertig... wird es wahrscheinlich auch nicht werden... 
 		int sourceHeader = in[0].length;
 		int sourceLength= in.length;
 		int targetLength = 0;
@@ -606,6 +627,118 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		liLiMessungen.add(m);
 	}
 
+	private void saveData()
+		{
+			
+			
+	//		System.out.println( "saveData() " + fileSave );
+			
+			FileWriter fw = null;
+			
+			try
+			{
+				// Klasse 'FileWriter' zum schreiben von Text-Dateien
+				// optionaler Parameter: true = append, false = neu schreiben
+				//
+				fw = new FileWriter(fileSave, false);
+				
+				// durchlaufen der Linked List und in die Textdatei schreiben
+				//
+				for( Messung m : liLiMessungen )
+				{
+					fw.append(m.getNumericDate() + ";" + m.getValue1() + ";" + m.getValue2() + ";" + m.getMessUnit() + ";" +  m.getmID() +  System.lineSeparator());
+//							m.getStrMessArt()+ ";" + m.getValue1() + ";" + m.getValue2() + ";"+
+//							m.getMessUnit()+";" + m.getNumericDate() + System.lineSeparator() );
+					
+				}
+				
+				
+			} 
+			catch (Exception e)
+			{}
+			finally
+			{
+				if(fw != null)
+					try
+					{
+						fw.close();
+					} catch (Exception ex)
+					{
+						ex.printStackTrace();
+					}
+			}
+			
+	}
+
+
+	
+	
+	/**
+	 * liest eine Textdatei ein und erzeugt Messungen aus semikolon-separierten Zeilen.
+	 */
+	private void readData()
+	{
+		
+		System.out.println( "loadData() " + fileSave );
+		
+		liLiMessungen.clear();
+//		NUMBER_OF_COMBI = 0;
+		Scanner in = null;
+		
+		try
+		{
+			in = new Scanner( new FileInputStream( fileSave ) );
+			
+			// gibt es eine weitere Zeile ?
+			//
+			while( in.hasNext() )
+			{
+				
+				String[] splitted = in.nextLine().split(";");
+				
+				
+				
+				switch (Integer.parseInt(splitted[4]))
+				{
+				case BLUTDRUCK:
+					this.mObjMessung = new Messung(new Date(Long.parseLong(splitted[0])),Double.parseDouble(splitted[1]),Double.parseDouble(splitted[2]),
+							splitted[3],messArtEnum.blutDruck);
+
+					addMessungToLinkedList(mObjMessung);
+					addTableEntry();
+					break;
+				
+				case BLUTZUCKER:
+					this.mObjMessung = new Messung(new Date(Long.parseLong(splitted[0])),Double.parseDouble(splitted[1]),Double.parseDouble(splitted[2]),
+							splitted[3],messArtEnum.blutZucker);
+					addMessungToLinkedList(mObjMessung);
+					addTableEntry();
+					break;
+					
+				case GEWICHT:
+					this.mObjMessung = new Messung(new Date(Long.parseLong(splitted[0])),Double.parseDouble(splitted[1]),Double.parseDouble(splitted[2]),
+							splitted[3] ,messArtEnum.gewicht);
+					addMessungToLinkedList(mObjMessung);
+					addTableEntry();
+					break;
+
+				default:
+					break;
+					
+					
+				}
+				
+			}
+			
+		} 
+		catch (Exception ex)
+		{}
+		
+		if( in != null )
+			in.close();
+	}
+		
+	
 	/**
 	 * 
 	 * @return das Date aus dateMessung.
@@ -660,7 +793,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 				createMessung();		
 		
 		else if (o == miLoad)
-			dateiLesen();
+			readData();
+		else if (o == miSave)
+			saveData();
 	}
 
 	@Override

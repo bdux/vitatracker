@@ -15,9 +15,11 @@ import java.util.Date;
 public class Messung
 {
 	private int mID = -1;
-	private double[] wert = {0,0};
+	private double value1 = 0;
+	private double value2 = 0;
 	private Date zp;
 	private String messArtStr, messUnit;
+	private long numericDate = 0;
 	public static enum messArtEnum {blutDruck, gewicht, blutZucker};
 	
 	private Messung() {}
@@ -36,32 +38,38 @@ public class Messung
 		if (art == messArtEnum.blutDruck)
 		{
 			this.zp = date;
-			this.wert[0] = value1;
-			this.wert[1] = value2;
+			this.numericDate = date.getTime();
+			this.value1 = value1;
+			this.value2 = value2;
 			this.messArtStr = MainWindow.M_STR_BLUTDRUCK;
 			this.messUnit = unit;
 			this.mID = MainWindow.BLUTDRUCK;
+			System.out.println("Messung erstellt: " + zp + "," + numericDate + "," + value1 + "," + value2 + "," + messArtStr + "," + messUnit + "," + mID);
 		}
 		
 		if (art == messArtEnum.blutZucker)
 		{
 			this.zp = date;
-			this.wert[0] = value1;
-			this.wert[1] = 0;
+			this.numericDate = date.getTime();
+			this.value1 = value1;
+			this.value2 = value2;
 			this.messArtStr = MainWindow.M_STR_BLUTZUCKER;
 			this.messUnit = unit;
 			this.mID = MainWindow.BLUTZUCKER;
+			System.out.println("Messung erstellt: " + zp + "," + numericDate + "," + value1 + "," + value2 + "," + messArtStr + "," + messUnit + "," + mID);
 		}
 		
 		
 		if (art == messArtEnum.gewicht)
 		{
 			this.zp = date;
-			this.wert[0] = value1;
-			this.wert[1] = 0;
+			this.numericDate = date.getTime();
+			this.value1 = value1;
+			this.value2 = value2;
 			this.messArtStr = MainWindow.M_STR_GEWICHT;
 			this.messUnit = unit;
 			this.mID = MainWindow.GEWICHT;
+			System.out.println("Messung erstellt: " + zp + "," + numericDate + "," + value1 + "," + value2 + "," + messArtStr + "," + messUnit + "," + mID);
 		}
 	}
 	
@@ -82,11 +90,15 @@ public class Messung
 	 * @param val double Messwert am index val.
 	 * @return
 	 */
-	public double getValueAtIndex(int val)
+	public double getValue1()
 	{
-		return wert[val];
+		return this.value1;
 	}
 	
+	public double getValue2()
+	{
+		return this.value2;
+	}
 	
 	/**
 	 * 
@@ -105,6 +117,11 @@ public class Messung
 	{
 		return mID;
 	}
+	
+	public long getNumericDate()
+	{
+		return numericDate;
+	}
 
 	/**
 	 * 
@@ -114,5 +131,5 @@ public class Messung
 	{
 		return messUnit;
 	}
-	
+
 }
