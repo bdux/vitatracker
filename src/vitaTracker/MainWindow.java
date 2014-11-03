@@ -311,49 +311,49 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 
 	
 	
-	public void datenLesenInArrays()
-	{
-		Scanner scanner = null;
-		String zeile;
-		
-		int colCounter = 0;
-		int rowCounter = 0;
-		
-		try 
-		{ 
-			for(int u = 0; u<=1; u++)
-			{
-				colCounter = 0;
-				
-				scanner = new Scanner( new FileInputStream(file) ); 
-				
-				while(scanner.hasNext())
-				{
-					zeile = scanner.nextLine();
-					String[] split = zeile.split(";");
-					
-					// System.out.println( "Zeile " + markenZaehler + " : " + zeile );
-					
-					if(u ==1 && !split[0].equals("#"))
-					{
-						objArrTable[0][colCounter] = split[0];
-						for(int i = 1; i < split.length; i++)
-							objArrTable[i][colCounter] = split[i];
-					}
-					
-					rowCounter = rowCounter < (split.length) ? split.length : rowCounter; 
-					colCounter ++;
-				}
-				
-				if(u == 0)
-					objArrTable = new String[rowCounter][colCounter];
-					
-				scanner.close();
-			}
-		}
-		catch (FileNotFoundException e) {}
-
-	}
+//	public void datenLesenInArrays()
+//	{
+//		Scanner scanner = null;
+//		String zeile;
+//		
+//		int colCounter = 0;
+//		int rowCounter = 0;
+//		
+//		try 
+//		{ 
+//			for(int u = 0; u<=1; u++)
+//			{
+//				colCounter = 0;
+//				
+//				scanner = new Scanner( new FileInputStream(file) ); 
+//				
+//				while(scanner.hasNext())
+//				{
+//					zeile = scanner.nextLine();
+//					String[] split = zeile.split(";");
+//					
+//					// System.out.println( "Zeile " + markenZaehler + " : " + zeile );
+//					
+//					if(u ==1 && !split[0].equals("#"))
+//					{
+//						objArrTable[0][colCounter] = split[0];
+//						for(int i = 1; i < split.length; i++)
+//							objArrTable[i][colCounter] = split[i];
+//					}
+//					
+//					rowCounter = rowCounter < (split.length) ? split.length : rowCounter; 
+//					colCounter ++;
+//				}
+//				
+//				if(u == 0)
+//					objArrTable = new String[rowCounter][colCounter];
+//					
+//				scanner.close();
+//			}
+//		}
+//		catch (FileNotFoundException e) {}
+//
+//	}
 
 	//Wird nicht genutzt, aber vielleicht noch brauchbar
 	private int getArrayIndexOf(String[] arr, String s)
@@ -445,7 +445,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		//TODO : das ist noch nicht fertig... wird es wahrscheinlich auch nicht werden... 
 		int sourceHeader = in[0].length;
-		int sourceLength= in.length;
+//		int sourceLength= in.length;
 		int targetLength = 0;
 		int messID = -1;
 		int filterOccurence = 1;
@@ -472,9 +472,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 				setStatusBarText("es wird nach Gewichtswerten gefiltert.");
 				break;
 			case M_STR_ALLE:
-				setStatusBarText("Bereit");
-				updateTableData(objArrTable);
-				return in;
+				setStatusBarText("Alle Filter entfernt.");
+//				updateTableData(objArrTable);
+				return objArrTable;
 		}
 		
 		try
@@ -494,12 +494,21 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			for(Messung m:liLiMessungen)
 			{
 				if (m.getmID() == messID)
-				newArray[nextIndex][0] = m.getStrMessArt();
-				newArray[nextIndex][1] = m.getValue1();
-				newArray[nextIndex][2] = m.getValue2();
-				newArray[nextIndex][3] = m.getDate();
-				nextIndex++;
-				
+				{
+					newArray[nextIndex][0] = m.getStrMessArt();
+					if (messID == BLUTDRUCK)
+					{	
+						newArray[nextIndex][1] = m.getValue1() + "/" + m.getValue2();
+					} 
+					else	
+					{	
+						newArray[nextIndex][1] = m.getValue1();
+					}
+					
+					newArray[nextIndex][2] = m.getMessUnit();
+					newArray[nextIndex][3] = sDForm.format(m.getDate());
+					nextIndex++;
+				}
 			}
 			
 //			updateTableData(newArray);
