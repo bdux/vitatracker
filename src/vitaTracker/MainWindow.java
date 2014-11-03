@@ -417,7 +417,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	 */
 	private Object[][] fillObjArray(LinkedList<Messung> src, Object[][]target)
 	{
-		
 		int row = src.size();
 	
 		target[row][0] = src.getLast().getStrMessArt();
@@ -433,7 +432,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		target[row][2] = src.getLast().getMessUnit();
 		target[row][3] = sDForm.format(src.getLast().getDate());
-		
 		
 		return target;
 	}
@@ -493,20 +491,18 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			System.arraycopy(in,0,newArray,0,targetLength);
 			
 			
-			for(int i = 0; i < sourceLength;i++)
+			for(Messung m:liLiMessungen)
 			{
-				if(in[i][0]  == filterSelection)
-				{
-//					System.arraycopy(in,i,newArray,nextIndex,targetLength);
-					newArray[nextIndex][0]  = in[i][0];
-					newArray[nextIndex][1]  = in[i][1];
-					newArray[nextIndex][2]  = in[i][2];
-					newArray[nextIndex][3]  = in[i][3];
-					nextIndex++;
-				}
+				if (m.getmID() == messID)
+				newArray[nextIndex][0] = m.getStrMessArt();
+				newArray[nextIndex][1] = m.getValue1();
+				newArray[nextIndex][2] = m.getValue2();
+				newArray[nextIndex][3] = m.getDate();
+				nextIndex++;
+				
 			}
 			
-			updateTableData(newArray);
+//			updateTableData(newArray);
 			return newArray;
 			
 		} 
