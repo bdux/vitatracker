@@ -178,15 +178,15 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 			}
 		}
 
-		systolicvalues = new double[in.size()];
-		diastolicValues = new double[in.size()];
-		bpDates = new long[in.size()];
+		systolicvalues = new double[bpCount];
+		diastolicValues = new double[bpCount];
+		bpDates = new long[bpCount];
 		
-		glucoValues = new double[in.size()];
-		glucoDates = new long[in.size()];
+		glucoValues = new double[glucoCount];
+		glucoDates = new long[glucoCount];
 		
-		weightValues = new double[in.size()];
-		weightDates = new long[in.size()];
+		weightValues = new double[weightCount];
+		weightDates = new long[weightCount];
 		
 		
 		for (int counter = 0;counter<in.size(); counter++)
@@ -195,10 +195,10 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 			switch (in.get(counter).getmID())
 			{
 			case MainWindow.BLUTDRUCK:
-				systolicvalues[counter] = m.getValue1();
-				diastolicValues[counter] = m.getValue2();
-				bpDates[counter] = m.getNumericDate();
-				
+				systolicvalues[bpCount] = m.getValue1();
+				diastolicValues[bpCount] = m.getValue2();
+				bpDates[bpCount] = m.getNumericDate();
+				bpCount--;
 				break;
 			
 			case MainWindow.BLUTZUCKER:
