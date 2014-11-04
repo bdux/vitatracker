@@ -568,11 +568,11 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 	
 	/**
-	 * erzeugt ein Messungsobjekt, unter Berücksichtigung des Ausgewählten indexes der cBoxMessArt.
+	 * erzeugt ein Messungsobjekt, unter Berücksichtigung des Ausgewählten indexes der cBoxMessArt 
+	 * und der ausgewählten Messungseinheit in cBoxMsngUnit.
 	 */
 	private void createMessung()
 	{
-		
 		try
 		{
 			switch (cBoxMessArten.getSelectedIndex()) 
@@ -584,9 +584,12 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 					if (Double.parseDouble(tfVal1.getText()) >= Double.parseDouble(tfVal2.getText()))
 					{
 					
-					this.mObjMessung = new Messung(this.getDateMessung(),Double.parseDouble(tfVal1.getText()),Double.parseDouble(tfVal2.getText()),
-					cBoxMsngUnit.getSelectedItem().toString() ,messArtEnum.blutDruck);
-					
+					this.mObjMessung = new Messung(
+							this.getDateMessung(),
+							Double.parseDouble(tfVal1.getText()),
+							Double.parseDouble(tfVal2.getText()),
+							cBoxMsngUnit.getSelectedItem().toString(),
+							messArtEnum.blutDruck);
 					
 					tfVal1.setText("");
 					tfVal2.setText("");
@@ -606,9 +609,13 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			
 				if (tfVal1.getText() != null )
 				{
-					this.mObjMessung = new Messung(this.getDateMessung(),Double.parseDouble(tfVal1.getText()),
-							0,cBoxMsngUnit.getSelectedItem().toString(),
+					this.mObjMessung = new Messung(
+							this.getDateMessung(),
+							Double.parseDouble(tfVal1.getText()),
+							0,
+							cBoxMsngUnit.getSelectedItem().toString(),
 							messArtEnum.blutZucker);
+					
 					tfVal1.setText("");
 					messWasCreated = true;
 				}
@@ -619,9 +626,13 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 				
 				if (tfVal1.getText() != null )
 				{
-					this.mObjMessung = new Messung(this.getDateMessung(),Double.parseDouble(tfVal1.getText()),
-							0,cBoxMsngUnit.getSelectedItem().toString(),
+					this.mObjMessung = new Messung(
+							this.getDateMessung(),
+							Double.parseDouble(tfVal1.getText()),
+							0,
+							cBoxMsngUnit.getSelectedItem().toString(),
 							messArtEnum.gewicht);
+					
 					tfVal1.setText("");
 					messWasCreated = true;
 				}	
@@ -663,7 +674,12 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 				
 				for( Messung m : liLiMessungen )
 				{
-					fw.append(m.getNumericDate() + ";" + m.getValue1() + ";" + m.getValue2() + ";" + m.getMessUnit() + ";" +  m.getmID() +  System.lineSeparator());
+					fw.append(m.getNumericDate() + ";" + 
+					m.getValue1() + ";" + 
+					m.getValue2() + ";" + 
+					m.getMessUnit() + ";" +  
+					m.getmID() +  
+					System.lineSeparator());
 				}
 				
 				
@@ -757,9 +773,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	/**
 	 * 
 	 */
-	private void showFilteredDiagram(Object[][] dataarray)
+	private void showDiagram(LinkedList<Messung> dataList)
 	{
-		vcf = new VitaChartFrame(this, dataarray);
+		vcf = new VitaChartFrame(this, dataList);
 		vcf.Show();
 		btnOpenChart.setEnabled(false);
 	}
@@ -825,7 +841,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			saveData();
 		else if (o == btnOpenChart)
 		{
-			showFilteredDiagram(filterTable(objArrTable));
+			showDiagram(liLiMessungen);
 //			JFrame diag = new JFrame();
 //			diag.setBounds(100, 100, 200, 200);
 //			diag.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
