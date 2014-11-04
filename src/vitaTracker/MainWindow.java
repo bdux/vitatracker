@@ -13,10 +13,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Scanner;
+
 import javax.swing.*;
+
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+
 import vitaTracker.Messung.messArtEnum;
 import vitaTracker.Util.*;
-
 
 /**
  * 
@@ -29,13 +33,14 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private JPanel 				pnBtnFoot, pnFilter, pnChart;  
 	private JPanel				pnHeadPanel,pnHdPnlLnSt;
 	private JPanel				pnEingabe, pnEingabeInner;
-
+	private ChartPanel			chartPanel;
 	
 	private JButton				btnFelderLoeschen, btnDatenHolen,btnMessZeitSetzen, btnMessCommit;
 	private JButton				btnMessAdd;
+	protected JButton	/*temporär: */ btnOpenChart;
 	private JMenuBar 			menuBar;
-	private JMenu 				datei, extras;
-	private JMenuItem 			miLoad, miSave, miExit, miEval;
+	private JMenu 				menDatei, menExtras, submenEval;
+	private JMenuItem 			miLoad, miSave, miExit, miEvalTable, miEvalChart;
 	private JLabel				lblVal1, lblVal2, lblMessZeit, lblUnit,lblFilterSelect;
 	private JTextField			tfMessZeit;
 	private ValueField			tfVal1, tfVal2;
@@ -57,9 +62,12 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private StatusBar			sbStaBarMainWin;
 	private BorderLayout		blFrameLayout, blEgPnl, blHdPn, blPnHdPnlLnSt;
 	private GridLayout			blFltrPn, blFlterPl;
-	private final String fileRead = "Messungen.txt";
-	private final String fileSave = "Messungen.txt";
+	private final String 		fileRead = "Messungen.txt";
+	private final String 		fileSave = "Messungen.txt";
 	private File				file = new File(fileRead);
+	private ButtonGroup			subMenBtnGrp;
+	protected ImageIcon 		icon;
+	protected VitaChartFrame	vcf;
 	
 	
 	private boolean messWasCreated = false;
@@ -73,7 +81,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	public static final String M_STR_BLUTDRUCK = "Blutdruck", M_STR_BLUTZUCKER = "Blutzucker", M_STR_GEWICHT = "Gewicht", M_STR_ALLE = "Alle";
 	public static final String UN_STR_BP_UNIT = "mmHg", UN_WEIGHT_METRIC = "Kg", UN_WEIGHT_IMPERIAL = "lbs", UN_GLUCO_MOL = "mmol/L", UN_GLUCO_MG = "mg/DL";
 	public static final String COL_NAME_MESSART = "Messungsart", COL_NAME_VALUE = "Wert", COL_NAME_UNIT = "Einheit", COL_NAME_TIME = "Messzeitpunkt";
-	
+	public static final String MAIN_WINDOW_TITLE = "VitaTracker: Hauptfenster", DIAGRAM_WINDOW_TITLE = "VitaTracker: Grafische Auswertung";
 	
 	public MainWindow()
 	{
@@ -118,9 +126,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		this.setResizable(true);
 		
 		urlIconURL 			= getClass().getResource("/resource/120px-Health-stub.gif");
-		ImageIcon icon 		= new ImageIcon(urlIconURL);
+		icon 		= new ImageIcon(urlIconURL);
 		this.setIconImage(icon.getImage());
-		this.setTitle("VitaTracker");
+		this.setTitle(MAIN_WINDOW_TITLE);
 		
 		strArrtableColNames = new String[] {COL_NAME_MESSART, COL_NAME_VALUE, COL_NAME_UNIT, COL_NAME_TIME};
 		strArrmessArten 	= new String[] {M_STR_BLUTDRUCK,M_STR_BLUTZUCKER,M_STR_GEWICHT};
@@ -239,20 +247,35 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		btnMessAdd.setEnabled(true);
 		pnBtnFoot.add(btnMessAdd);
 		
+		// Funktion erst mit DB Anbindung, fraglich ob bis zum Ende machbar.
 		btnMessCommit 		= new JButton("Messungen Sichern");
 		btnMessCommit.addActionListener(this);
 		btnMessCommit.setEnabled(false);
 		pnBtnFoot.add(btnMessCommit);
 		
+		btnOpenChart 		= new JButton("Diagramm anzeigen");
+		btnOpenChart.addActionListener(this);
+		pnBtnFoot.add(btnOpenChart);
+		
 		//Menüleiste
 		menuBar 			= new JMenuBar();
-		datei = WinUtil.createMenu(menuBar, "Datei", "menuName", 'D');
-		extras = WinUtil.createMenu(menuBar, "Extras", "Extras", 'X');
+		menDatei = WinUtil.createMenu(menuBar, "Datei", "menuName", 'D');
+		menExtras = WinUtil.createMenu(menuBar, "Extras", "Extras", 'X');
+		submenEval = WinUtil.createSubMenu(menExtras, "Auswertung", "Auswertung", 'W');
+		subMenBtnGrp = new ButtonGroup();
 		
-		miLoad = WinUtil.createMenuItem(datei, "Laden", WinUtil.MenuItemType.ITEM_PLAIN, this, "Laden", null, 'L', null);
-		miSave = WinUtil.createMenuItem(datei, "Speichern", WinUtil.MenuItemType.ITEM_PLAIN, this, "Speichern", null, 'A', null);
-		miExit = WinUtil.createMenuItem(datei, "Beenden", WinUtil.MenuItemType.ITEM_PLAIN, this, "Beenden", null, 'N', null);
-		miEval = WinUtil.createMenuItem(extras, "Auswertung", WinUtil.MenuItemType.ITEM_PLAIN, this, "Auswertung", null, 'W',null);
+		
+		miLoad = WinUtil.createMenuItem(menDatei, "Laden", WinUtil.MenuItemType.ITEM_PLAIN, this, "Laden", null, 'L', null);
+		miSave = WinUtil.createMenuItem(menDatei, "Speichern", WinUtil.MenuItemType.ITEM_PLAIN, this, "Speichern", null, 'A', null);
+		miExit = WinUtil.createMenuItem(menDatei, "Beenden", WinUtil.MenuItemType.ITEM_PLAIN, this, "Beenden", null, 'N', null);
+		
+		miEvalTable = WinUtil.createMenuItem(submenEval, "Tabelle", WinUtil.MenuItemType.ITEM_RADIO, this, "Tabellarisch", null, 'L',null);
+		miEvalTable.setSelected(true);
+		subMenBtnGrp.add(miEvalTable);
+		
+		miEvalChart = WinUtil.createMenuItem(submenEval, "Diagramm", WinUtil.MenuItemType.ITEM_RADIO, this, "Grafisch", null, 'R',null);
+		subMenBtnGrp.add(miEvalChart);
+		
 		this.setJMenuBar(menuBar);
 			
 		setUIEntries(cBoxMessArten.getSelectedIndex());
@@ -733,6 +756,16 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	/**
 	 * 
+	 */
+	private void showFilteredDiagram(Object[][] dataarray)
+	{
+		vcf = new VitaChartFrame(this, dataarray);
+		vcf.Show();
+		btnOpenChart.setEnabled(false);
+	}
+
+	/**
+	 * 
 	 * @return das Date aus dateMessung.
 	 */
 	public Date getDateMessung()
@@ -761,12 +794,12 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 
 	/**
-	 * @deprecated
-	 * @param bool HilfsKlasse zum Setzen des Enabled Status des btnMessAdd.
+	 * 
+	 * @param bool HilfsKlasse zum Setzen des Enabled Status eines Buttons.
 	 */
-	public void setbtnMessAddEnabledState( boolean bool)
+	protected void setbtnEnabledState(JButton btn, boolean bool)
 	{	
-		btnMessAdd.setEnabled(bool);
+		btn.setEnabled(bool);
 	}
 
 	/*die Listener-Methoden*/
@@ -788,8 +821,16 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		}
 		else if (o == miLoad)
 			readData();
-		else if (o == miSave)
+		else if (o == miSave | o == btnMessCommit)
 			saveData();
+		else if (o == btnOpenChart)
+		{
+			showFilteredDiagram(filterTable(objArrTable));
+//			JFrame diag = new JFrame();
+//			diag.setBounds(100, 100, 200, 200);
+//			diag.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//			diag.setVisible(true);
+		}
 	}
 
 	@Override
@@ -802,6 +843,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	public void windowClosing(WindowEvent e)
 	{
 		this.dispose();
+		
+		if (vcf != null)
+			vcf.dispose();
 	}
 
 	@Override
