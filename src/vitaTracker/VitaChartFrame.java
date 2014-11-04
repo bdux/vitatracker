@@ -191,24 +191,35 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 		
 		for (int counter = 0;counter<in.size(); counter++)
 		{
-			
+			int bpC=0, glC=0, wC = 0;
 			switch (in.get(counter).getmID())
 			{
 			case MainWindow.BLUTDRUCK:
-				systolicvalues[bpCount] = m.getValue1();
-				diastolicValues[bpCount] = m.getValue2();
-				bpDates[bpCount] = m.getNumericDate();
-				bpCount--;
+				if(bpC<=bpCount)
+				{
+					systolicvalues[bpC] = m.getValue1();
+					diastolicValues[bpC] = m.getValue2();
+					bpDates[bpC] = m.getNumericDate();
+					bpC++;
+				}
 				break;
 			
 			case MainWindow.BLUTZUCKER:
-				glucoValues[counter] = m.getValue1();
-				glucoDates[counter] = m.getNumericDate();
+				if(glC<=glucoCount)
+				{
+					glucoValues[glC] = m.getValue1();
+					glucoDates[glC] = m.getNumericDate();
+					glC++;
+				}
 				break;
 			
 			case MainWindow.GEWICHT:
-				glucoValues[counter] = m.getValue1();
-				weightDates[counter] = m.getNumericDate();
+				if(wC <= weightCount)
+				{
+					glucoValues[wC] = m.getValue1();
+					weightDates[wC] = m.getNumericDate();
+					wC++;
+				}
 				break;
 
 			default:
