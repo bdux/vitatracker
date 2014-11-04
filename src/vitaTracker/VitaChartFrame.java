@@ -16,6 +16,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.plot.CombinedDomainXYPlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.PlotState;
@@ -37,7 +38,7 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 	
 	private LinkedList<Messung> data;
 //	private DataSet dataset;
-	private XYDataset dataset;
+	private XYDataset bpSysDataset, bpDiaDataset, glucoDataSet, weightDataset;
 	private JFreeChart jChart;
 	
 	
@@ -114,11 +115,11 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 	private void initChartData()
 	{
 		readDataIntoArrays(data);
-		XYSeries sysSeries = new XYSeries("Systolische Werte");
-//        for(int i=0;i<systolicvalues.length;i++)
-//        sysSeries.add(systolicvalues[i], bpDates[i]);
-         	dataset = DataSet.dataset(systolicvalues, bpDates, "Systol");
-//        dataset.addSeries(sysSeries);
+       	bpSysDataset = DataSet.dataset(systolicvalues, bpDates, "Syst");
+       	bpDiaDataset= DataSet.dataset(diastolicValues, bpDates, "Dias");
+       	bpSysDataset = DataSet.dataset(glucoValues, glucoDates, "Gluc");
+       	bpSysDataset = DataSet.dataset(weightValues, weightDates, "Gew");
+    
 	}
 
 	/**
@@ -128,15 +129,29 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 	{
 		
 		XYLineAndShapeRenderer line = new XYLineAndShapeRenderer();
-		NumberAxis yax = new NumberAxis("Systolisch");
-		NumberAxis xax = new NumberAxis("Zeitpunkt");
-		XYPlot plot = new XYPlot(dataset, xax, yax, line);
-		ValueAxis domainAxis = new DateAxis();
+		NumberAxis yaxSys = new NumberAxis("Syst");
+		NumberAxis yaxDias = new NumberAxis("Diast");
+		NumberAxis yaxGluc = new NumberAxis("Gluc");
+		NumberAxis yaxWeigh = new NumberAxis("Gewicht");
 		
-		plot.setDomainAxis(domainAxis);
+		ValueAxis xax = new DateAxis("Zeitpunkt");
+		CombinedDomainXYPlot mainPlot = new CombinedDomainXYPlot();
+		
+		XYPlot sysPlot = new XYPlot(bpSysDataset, xax, yaxSys, line);
+		mainPlot.add(sysPlot);
+		
+		XYPlot diasPlot = new XYPlot(bpDiaDataset, xax, yaxDias, line);
+		mainPlot.add(diasPlot);
+		
+		XYPlot glucoPlot = new XYPlot(glucoDataSet, xax, yaxGluc, line);
+		mainPlot.add(glucoPlot);
+		
+		XYPlot weightPlot = new XYPlot(weightDataset, xax, yaxWeigh, line);
+		mainPlot.add(weightPlot);
 		
 		
-		jChart = new JFreeChart(plot);
+		jChart = new JFreeChart(mainPlot);
+		
 		ChartPanel chartPanel = new ChartPanel(jChart);
 		this.add(chartPanel);
 		

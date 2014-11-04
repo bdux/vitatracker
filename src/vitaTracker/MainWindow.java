@@ -842,10 +842,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		else if (o == btnOpenChart)
 		{
 			showDiagram(liLiMessungen);
-//			JFrame diag = new JFrame();
-//			diag.setBounds(100, 100, 200, 200);
-//			diag.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//			diag.setVisible(true);
 		}
 	}
 
