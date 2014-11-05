@@ -21,7 +21,7 @@ public class Globals
 	 {
 		 int retValue = 0;
 		 
-		 String SQL = "SELECT MAX(PRIMARYKEY) FROM POSTLEITZAHLEN";
+		 String SQL = "SELECT MAX(PRIMARYKEY) FROM messungen";
 		 Object obj = DBConnection.executeScalar(SQL);
 		 if (obj != null) retValue = Integer.parseInt(obj.toString());
 		 	 
@@ -34,12 +34,15 @@ public class Globals
 		 return "'" + value + "'";
 	 }
 	 
-	 public static boolean istPLZOrtVorhanden(String PLZ, String Ort)
+	 public static boolean istMessungVorhanden(String timestamp, String val1, String val2, String messUnit, String messArtID)
 	 {
 		 
-		 String SQL = "SELECT COUNT(*) FROM POSTLEITZAHLEN ";
-		 SQL += "WHERE PLZ = " + Globals.quote(PLZ);
-		 SQL += " AND ORT = " + Globals.quote(Ort);
+		 String SQL = "SELECT COUNT(*) FROM messungen ";
+		 SQL += "WHERE timestamp = " + Globals.quote(timestamp);
+		 SQL += " AND val1 = " + Globals.quote(val1);
+		 SQL += " AND val2 = " + Globals.quote(val2);
+		 SQL += " AND messUnit = " + Globals.quote(messUnit);
+		 SQL += " AND messArtID = " + Globals.quote(messArtID);
 		 
 		 Object obj = DBConnection.executeScalar(SQL);
 		 

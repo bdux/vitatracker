@@ -28,13 +28,13 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 	private MainWindow owner;
 	private int winX, winY, winHeight = 500, winWidth = 500;
 	
-	protected static ChartPanel chrtPanel;
+	protected  ChartPanel chrtPanel;
 	protected static JScrollPane imgScrllPane;
 	
 	private LinkedList<Messung> data;
 //	private DataSet dataset;
 //	private XYDataset bpSysDataset, bpDiaDataset, glucoDataSet, weightDataset;
-	private JFreeChart jChart;
+	protected JFreeChart jChart;
 	private XYPlot plot;
 	
 	protected double[] systolicvalues;
@@ -104,7 +104,7 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 	{
 		readDataIntoArrays(data);
 	}
-
+	
 	/**
 	 * 
 	 */
@@ -154,17 +154,14 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 			if (m.getmID() == MainWindow.BLUTDRUCK)
 			{
 				bpCount++;
-				System.out.println("bpCount: " + bpCount);
 			}
 			else if (m.getmID() == MainWindow.BLUTZUCKER)
 			{
 				glucoCount++;
-				System.out.println("glucoCount: " + glucoCount);
 			}
 			else if (m.getmID() == MainWindow.GEWICHT)
 			{
 				weightCount++;
-				System.out.println("weightCount: " + weightCount);
 			}
 		}
 
@@ -244,7 +241,9 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 
 	@Override
 	public void windowDeactivated(WindowEvent e)
-	{}
+	{
+		chrtPanel.repaint();
+	}
 
 	@Override
 	public void windowDeiconified(WindowEvent e)

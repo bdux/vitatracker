@@ -44,7 +44,6 @@ public class Messung
 			this.messArtStr = MainWindow.M_STR_BLUTDRUCK;
 			this.messUnit = unit;
 			this.mID = MainWindow.BLUTDRUCK;
-			System.out.println("Messung erstellt: " + zp + "," + numericDate + "," + value1 + "," + value2 + "," + messArtStr + "," + messUnit + "," + mID);
 		}
 		
 		if (art == messArtEnum.blutZucker)
@@ -56,7 +55,6 @@ public class Messung
 			this.messArtStr = MainWindow.M_STR_BLUTZUCKER;
 			this.messUnit = unit;
 			this.mID = MainWindow.BLUTZUCKER;
-			System.out.println("Messung erstellt: " + zp + "," + numericDate + "," + value1 + "," + value2 + "," + messArtStr + "," + messUnit + "," + mID);
 		}
 		
 		
@@ -69,7 +67,6 @@ public class Messung
 			this.messArtStr = MainWindow.M_STR_GEWICHT;
 			this.messUnit = unit;
 			this.mID = MainWindow.GEWICHT;
-			System.out.println("Messung erstellt: " + zp + "," + numericDate + "," + value1 + "," + value2 + "," + messArtStr + "," + messUnit + "," + mID);
 		}
 	}
 	

@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
+import java.sql.PreparedStatement;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -12,13 +14,15 @@ import java.util.LinkedList;
 import java.util.Scanner;
 
 import javax.swing.*;
+
 import org.jfree.chart.ChartPanel;
 
+import vitaTracker.Util.Globals;
 import vitaTracker.Messung.messArtEnum;
 import vitaTracker.Util.DateTimePicker;
 import vitaTracker.Util.StatusBar;
 import vitaTracker.Util.WinUtil;
-
+import vitaTracker.Util.DBConnection;
 /**
  * 
  * @author Benjamin Dux
@@ -35,9 +39,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private JButton				btnMessAdd;
 	protected JButton	/*tempor‰r: */ btnOpenChart;
 	private JMenuBar 			menuBar;
-	private JMenu 				menDatei, menExtras, submenEval;
-	private JMenuItem 			miLoad, miSave, miExit, miEvalTable, miEvalChart;
-	private JLabel				lblVal1, lblVal2, lblMessZeit, lblUnit,lblFilterSelect;
+	private JMenu 				menDatei, menExtras, submenEval, submenDB;
+	private JMenuItem 			miLoad, miSave, miExit, miEvalTable, miEvalChart, miOpenDBConn, miCloseDBConn;
+	private JLabel				lblVal1, lblVal2, lblMessZeit, lblFilterSelect;
 	private JTextField			tfMessZeit;
 	private ValueField			tfVal1, tfVal2;
 	
@@ -51,9 +55,10 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private JComboBox<String> 	cBoxMessArten,cBoxMsngUnit,cbMessFilter;
 	private URL 				urlIconURL;
 	private Messung 			mObjMessung;
-	private LinkedList<Messung>	liLiMessungen;
+	protected LinkedList<Messung>	liLiMessungen;
 	private Object[][]			objArrTable;
 	private StatusBar			sbStaBarMainWin;
+	private JProgressBar		progressBar;
 	private BorderLayout		blFrameLayout, blEgPnl, blHdPn, blPnHdPnlLnSt;
 	private GridLayout			blFltrPn, blFlterPl;
 	private final String 		fileRead = "Messungen.txt";
@@ -65,6 +70,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	
 	private boolean messWasCreated = false;
+	
 
 	
 	// Diverse Parameter Ints 
@@ -141,6 +147,24 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		sbStaBarMainWin		= new StatusBar();
 		sbStaBarMainWin.setMessage("Bereit");
 		this.add(sbStaBarMainWin, blFrameLayout.PAGE_END);
+		
+		
+		progressBar = new JProgressBar(JProgressBar.HORIZONTAL);
+		progressBar.setBorderPainted(true);
+		progressBar.setPreferredSize( new Dimension(300, sbStaBarMainWin.getHeight()));
+
+		// Balkenfarbe
+		//
+		progressBar.setForeground(Color.GREEN);
+		
+		// Initial auf invisible
+		//
+		progressBar.setVisible(false);
+		
+		// Zur Statusbar hinzuf√ºgen (rechts)
+		//
+		sbStaBarMainWin.add(progressBar, BorderLayout.LINE_END);
+		
 		
 		pnEingabe 			= new JPanel();
 		pnEingabe.setLayout(blEgPnl);
@@ -242,7 +266,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		// Funktion erst mit DB Anbindung, fraglich ob bis zum Ende machbar.
 		btnMessCommit 		= new JButton("Messungen Sichern");
 		btnMessCommit.addActionListener(this);
-		btnMessCommit.setEnabled(false);
+//		btnMessCommit.setEnabled(true);
 //		pnBtnFoot.add(btnMessCommit);
 		
 		btnOpenChart 		= new JButton("Diagramm anzeigen");
@@ -254,6 +278,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		menDatei = WinUtil.createMenu(menuBar, "Datei", "menuName", 'D');
 		menExtras = WinUtil.createMenu(menuBar, "Extras", "Extras", 'X');
 		submenEval = WinUtil.createSubMenu(menExtras, "Auswertung", "Auswertung", 'W');
+		submenDB = WinUtil.createSubMenu(menExtras, "DB Verbindung", "DB Verbindung", 'V');
 		subMenBtnGrp = new ButtonGroup();
 		
 		
@@ -261,11 +286,15 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		miSave = WinUtil.createMenuItem(menDatei, "Speichern", WinUtil.MenuItemType.ITEM_PLAIN, this, "Speichern", null, 'A', null);
 		miExit = WinUtil.createMenuItem(menDatei, "Beenden", WinUtil.MenuItemType.ITEM_PLAIN, this, "Beenden", null, 'N', null);
 		
-		miEvalTable = WinUtil.createMenuItem(submenEval, "Tabelle", WinUtil.MenuItemType.ITEM_RADIO, this, "Tabellarisch", null, 'L',null);
-		miEvalTable.setSelected(true);
-		subMenBtnGrp.add(miEvalTable);
+		miOpenDBConn = WinUtil.createMenuItem(submenDB, "Verdbindung ˆffnen", WinUtil.MenuItemType.ITEM_PLAIN, this, "Verbindung ÷ffnen", null, 'F', null);
+		miCloseDBConn = WinUtil.createMenuItem(submenDB, "Verdbindung schlieﬂen", WinUtil.MenuItemType.ITEM_PLAIN, this, "Verbindung schlieﬂen", null, 'L', null);
+		
+//		miEvalTable = WinUtil.createMenuItem(submenEval, "Tabelle", WinUtil.MenuItemType.ITEM_RADIO, this, "Tabellarisch", null, 'L',null);
+//		miEvalTable.setSelected(true);
+//		subMenBtnGrp.add(miEvalTable);
 		
 		miEvalChart = WinUtil.createMenuItem(submenEval, "Diagramm", WinUtil.MenuItemType.ITEM_RADIO, this, "Grafisch", null, 'R',null);
+		miEvalChart.setSelected(true);
 		subMenBtnGrp.add(miEvalChart);
 		
 		this.setJMenuBar(menuBar);
@@ -325,7 +354,42 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		}
 		
 	}
-
+	
+	
+	private void openMySQLDatabase()
+	{
+		String connectionString, classForName;
+		
+		String server ="localhost";
+		String dataBase = "vitatrack";
+		classForName = "com.mysql.jdbc.Driver";
+		
+		connectionString = "jdbc:mysql://" + server + ":3306/";
+		connectionString += dataBase;
+		
+		// "jdbc:mysql://127.0.0.1:3306/alfatraining"
+		
+		dbEnabled( DBConnection.connectToDatabase(
+			classForName, connectionString, "root", null) );
+		
+	}
+	
+	
+	private void dbEnabled(boolean enabled)
+	{
+		miOpenDBConn.setEnabled(!enabled);
+		miCloseDBConn.setEnabled(enabled);
+		
+		if(!enabled)
+		{
+			sbStaBarMainWin.setMessage("Datenbank: (keine)");
+			sbStaBarMainWin.setToolTipText("");
+		}	
+		else
+			sbStaBarMainWin.setMessage("Datenbank: (geˆffnet)");
+		
+	}
+	
 	//Wird nicht genutzt, aber vielleicht noch brauchbar
 	private int getArrayIndexOf(String[] arr, String s)
 	{
@@ -755,6 +819,169 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		btn.setEnabled(bool);
 	}
 
+	
+	
+	private class ReadFileIntoDatabase implements Runnable
+	{
+		private Scanner scanner = null;
+		private String zeile;
+		private String[] split;
+		private int primaryKey = 0;
+		private boolean errFlag = false;
+		private String dateiname;
+		private int readCounter, addCounter;
+		private String tempString;
+		private PreparedStatement prepStatementInsert;
+		
+		public ReadFileIntoDatabase(String dateiname)
+		{
+			this.dateiname = dateiname;
+		}
+		
+		@Override
+		public void run()
+		{
+			
+			primaryKey = Globals.getNextKey();
+			
+			// Fortschrittsanzeige vorbereiten
+			//
+			progressBar.setMinimum(0);
+			progressBar.setMaximum( (int)(new File(dateiname).length()) );
+			progressBar.setValue(0);
+			progressBar.setVisible(true);
+			
+			try
+			{
+				// Aktuellen Inhalt der Statusanzeige sichern.
+				//
+				tempString = sbStaBarMainWin.getText();
+				
+				// Verhindern, dass w√§hrend des Imports Benutzermen√º-Funktionen
+				// aufgerufen werden k√∂nnen.
+				//
+				for( int i = 0; i < menuBar.getMenuCount(); i++ )
+					menuBar.getMenu(i).setEnabled(false);
+				
+				DBConnection.beginTransaction();
+				
+				scanner = new Scanner( new FileInputStream(dateiname) );
+				
+				while( scanner.hasNext() )
+				{
+					// Evtl. vorhandene Hochkommas durch doppelte Hochkommas ersetzen
+					//
+					zeile = scanner.nextLine().replaceAll("'", "''");
+					
+					// ( Nicht f√ºr PreparedStatement )
+					//
+					// zeile = scanner.nextLine();
+					
+					readCounter++;
+					
+					progressBar.setValue(
+						progressBar.getValue() + zeile.length() + System.lineSeparator().length() );
+					
+					if( readCounter % 10 == 0 )
+						sbStaBarMainWin.setMessage(
+							String.format("Es werden Datens‰tze eingelesen [%s]",
+							NumberFormat.getInstance().format(readCounter)));
+					
+					// Methode 'split' mit maximaler Anzahl 
+					// zur¸ckzuliefernder Zeichenketten
+					//
+					split = zeile.split(";", 5);
+					
+					if(split.length == 5)
+					{
+						
+						if ( Globals.istMessungVorhanden( split[0], split[1], split[2], split[3], split[4]) )
+							continue;
+						
+						if( insertMessung( Long.parseLong(split[0]), Double.parseDouble(split[1]), Double.parseDouble(split[2]), split[3], Integer.parseInt(split[4]) ) ) 
+						{
+							primaryKey++;
+							addCounter++;
+						}
+						else
+						{
+							errFlag = true;
+							break;
+						}
+					}
+					
+				}
+				
+			} 
+			catch (Exception ex)
+			{
+				errFlag = true;
+				JOptionPane.showMessageDialog(
+					null, 
+					"Fehler beim Einlesen der Datei " + dateiname + ": " + ex.getMessage(), 
+					"E/A Fehler", 
+					JOptionPane.ERROR_MESSAGE);			
+			}
+			
+			if( scanner != null ) scanner.close();
+			
+			if(errFlag)
+			{
+				DBConnection.rollbackTransaction();
+				addCounter = 0;
+			}
+			else
+			{
+				DBConnection.commitTransaction();
+			}
+			
+			// Originalen Inhalt der Statusanzeige wiederherstellen
+			//
+			sbStaBarMainWin.setText(tempString);
+			
+			progressBar.setValue(0);
+			progressBar.setVisible(false);
+			
+			// Benutzermen√º wieder aktivieren.
+			//
+			for( int i = 0; i < menuBar.getMenuCount(); i++ )
+				menuBar.getMenu(i).setEnabled(true);
+
+			JOptionPane.showMessageDialog(
+				null,
+				String.format("Es wurden %s Datens√§tze erfolgreich eingelesen",
+					NumberFormat.getInstance().format(addCounter))
+			);
+		}
+	}
+	
+	
+	
+	private boolean insertMessung(long timestamp, double val1, double val2, String messUnit, int messArtID )
+	{
+		
+		String sql = "INSERT INTO messungen ";
+		sql += "( val1, val2, messArtStr, messUnit, messArtID, timestamp ) ";
+		sql += "VALUES (";
+		sql += Double.toString(val1) + ", ";
+		sql += Double.toString(val2) + ", ";
+		sql += messUnit + ", ";
+		sql += Integer.toString(messArtID) + ", ";
+		sql += Long.toString(timestamp) + ")";
+		
+		return DBConnection.executeNonQuery(sql) > 0;
+		
+		
+		/*
+		 *   INSERT INTO tn ( pk, plz, ort ) VALUES ( 109, '68165', 'Mannheim' )
+		 */
+		
+		
+		
+	}
+	
+	
+	
 	/*die Listener-Methoden*/
 	
 	@Override
@@ -772,15 +999,29 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			createMessung();
 			cbMessFilter.setSelectedItem(M_STR_ALLE);
 		}
+		
 		else if (o == miLoad)
 			readData();
 		else if (o == miSave | o == btnMessCommit)
 			saveData();
 		else if (o == btnOpenChart )
-		{
 			showDiagram(liLiMessungen);
+		else if (o == miOpenDBConn)
+			openMySQLDatabase();
+		else if(o == miCloseDBConn)
+		{	
+			DBConnection.closeConnection();
+			dbEnabled(false);
+		}
+		else if (o == btnMessCommit)
+		{
+			new ReadFileIntoDatabase(fileRead);
 		}
 	}
+
+	/**
+	 * 
+	 */
 
 	@Override
 	public void windowActivated(WindowEvent e){}
