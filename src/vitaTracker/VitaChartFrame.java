@@ -1,31 +1,26 @@
 package vitaTracker;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.text.SimpleDateFormat;
+import java.awt.BorderLayout;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.Date;
 import java.util.LinkedList;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.data.time.Day;
-import org.jfree.data.time.Minute;
-import org.jfree.data.time.Month;
-import org.jfree.data.time.RegularTimePeriod;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.time.Week;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 
 public class VitaChartFrame extends JFrame implements WindowListener, MouseMotionListener
 {
@@ -93,15 +88,8 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 		JPanel kopfZeile = new JPanel();
 		kopfZeile.setLayout(new BorderLayout());
 		
-		
-		
 		this.add(kopfZeile, BorderLayout.PAGE_START);
-	
-		
 		chrtPanel = new ChartPanel(jChart);
-//		chrtPanel.setSize(300, 300);
-//		chrtPanel.addMouseMotionListener(this);
-//		imgScrllPane = new JScrollPane(chrtPanel);
 		this.add(chrtPanel, BorderLayout.CENTER);
 
 		initChartData();
@@ -115,11 +103,6 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 	private void initChartData()
 	{
 		readDataIntoArrays(data);
-//       	bpSysDataset = DataSet.dataset(systolicvalues, bpDates, "Syst");
-//       	bpDiaDataset= DataSet.dataset(diastolicValues, bpDates, "Dias");
-//       	bpSysDataset = DataSet.dataset(glucoValues, glucoDates, "Gluc");
-//       	bpSysDataset = DataSet.dataset(weightValues, weightDates, "Gew");
-    
 	}
 
 	/**
@@ -131,8 +114,6 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 	private TimeSeries createVitaSeries(double[] values, long[] dates,final String name) 
 	{
         final TimeSeries timeSeries = new TimeSeries(name);
-//        RegularTimePeriod t = new Day();
- 
         
         for (int i = 0; i<values.length;i++) 
         {
@@ -163,17 +144,13 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 	        renderer.setBaseShapesVisible(true);
 		ChartPanel chartPanel = new ChartPanel(jChart);
 		this.add(chartPanel);
-		
 	}
 	
 	public void readDataIntoArrays(LinkedList<Messung> in)
 	{
 		
-		
 		for (Messung m:in)
 		{
-//			m = in.get(i);
-						
 			if (m.getmID() == MainWindow.BLUTDRUCK)
 			{
 				bpCount++;
@@ -194,7 +171,6 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 		systolicvalues = new double[bpCount];
 		diastolicValues = new double[bpCount];
 		bpDates = new long[bpCount];
-		System.out.println("sys[]length: " + systolicvalues.length);
 		
 		glucoValues = new double[glucoCount];
 		glucoDates = new long[glucoCount];
@@ -210,7 +186,7 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 			switch (m.getmID())
 			{
 			case MainWindow.BLUTDRUCK:
-				m.getAllData(); //hilfsmethode... 
+				
 				systolicvalues[bpC] = m.getValue1();
 				diastolicValues[bpC] = m.getValue2();
 				bpDates[bpC] = m.getNumericDate();
@@ -219,7 +195,7 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 				break;
 			
 			case MainWindow.BLUTZUCKER:
-				m.getAllData(); //hilfsmethode... 
+
 				glucoValues[glC] = m.getValue1();
 				glucoDates[glC] = m.getNumericDate();
 				glC++;
@@ -227,7 +203,7 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 				break;
 			
 			case MainWindow.GEWICHT:
-				m.getAllData(); //hilfsmethode... 
+				 
 				weightValues[wC] = m.getValue1();
 				weightDates[wC] = m.getNumericDate();
 				wC++;
@@ -237,15 +213,7 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 			default:
 				break;
 			}
-			
-			
 		}
-		
-		for (int i = 0; i<bpCount;i++)
-			System.out.println(i+ " , " +systolicvalues[i]+ " , "+ diastolicValues[i]+" , " + new SimpleDateFormat("HH:mm, dd.MM.yyyy").format(new Date(bpDates[i])));
-		
-		
-		
 	}
 
 	public void Show()
@@ -253,22 +221,14 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 		this.setVisible(true);
 	}
 
-	public void setImageOnImagePanel(File bildPfad, BufferedImage bild)
-	{
-//		chrtPanel.setImage(bildPfad,bild);
-	}
+	@Override
+	public void mouseDragged(MouseEvent e) {}
 
 	@Override
-	public void mouseDragged(MouseEvent e)
-	{}
+	public void mouseMoved(MouseEvent e) {}
 
 	@Override
-	public void mouseMoved(MouseEvent e)
-	{}
-
-	@Override
-	public void windowActivated(WindowEvent e)
-	{}
+	public void windowActivated(WindowEvent e) {}
 
 	@Override
 	public void windowClosed(WindowEvent e)

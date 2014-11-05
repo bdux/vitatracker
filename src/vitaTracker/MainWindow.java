@@ -2,10 +2,7 @@ package vitaTracker;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.io.*;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -15,12 +12,12 @@ import java.util.LinkedList;
 import java.util.Scanner;
 
 import javax.swing.*;
-
 import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
 
 import vitaTracker.Messung.messArtEnum;
-import vitaTracker.Util.*;
+import vitaTracker.Util.DateTimePicker;
+import vitaTracker.Util.StatusBar;
+import vitaTracker.Util.WinUtil;
 
 /**
  * 
@@ -30,12 +27,11 @@ import vitaTracker.Util.*;
 public class MainWindow extends JFrame implements ActionListener, WindowListener, ItemListener
 {
 
-	private JPanel 				pnBtnFoot, pnFilter, pnChart;  
+	private JPanel 				pnBtnFoot, pnFilter;
 	private JPanel				pnHeadPanel,pnHdPnlLnSt;
 	private JPanel				pnEingabe, pnEingabeInner;
-	private ChartPanel			chartPanel;
 	
-	private JButton				btnFelderLoeschen, btnDatenHolen,btnMessZeitSetzen, btnMessCommit;
+	private JButton				btnFelderLoeschen, btnDatenHolen, btnMessZeitSetzen, btnMessCommit;
 	private JButton				btnMessAdd;
 	protected JButton	/*temporär: */ btnOpenChart;
 	private JMenuBar 			menuBar;
@@ -49,13 +45,11 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private JScrollPane 		scrpTableScroll;
 	private WindowTableModel	tmWTableModel;
 	private String[]			strArrmessArten, strArrMessUnits, strArrtableColNames;
-	private String				stBarDefault;
+	private DateTimePicker 		dtpDaTime;
 	private Date				dateMessung;
-	private Calendar			calDateMess;
 	private SimpleDateFormat	sDForm;
 	private JComboBox<String> 	cBoxMessArten,cBoxMsngUnit,cbMessFilter;
 	private URL 				urlIconURL;
-	private DateTimePicker 		dtpDaTime;
 	private Messung 			mObjMessung;
 	private LinkedList<Messung>	liLiMessungen;
 	private Object[][]			objArrTable;
@@ -160,7 +154,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		pnEingabeInner.setBackground(pnEingabe.getBackground());
 		pnEingabe.add(pnEingabeInner, blEgPnl.CENTER);
 		
-		pnBtnFoot			 = new JPanel();
+		pnBtnFoot			= new JPanel();
 		pnBtnFoot.setLayout(blFltrPn);
 		pnBtnFoot.setBackground(pnEingabe.getBackground());
 		pnEingabe.add(pnBtnFoot, blEgPnl.PAGE_END);
@@ -332,52 +326,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 	}
 
-	
-	
-//	public void datenLesenInArrays()
-//	{
-//		Scanner scanner = null;
-//		String zeile;
-//		
-//		int colCounter = 0;
-//		int rowCounter = 0;
-//		
-//		try 
-//		{ 
-//			for(int u = 0; u<=1; u++)
-//			{
-//				colCounter = 0;
-//				
-//				scanner = new Scanner( new FileInputStream(file) ); 
-//				
-//				while(scanner.hasNext())
-//				{
-//					zeile = scanner.nextLine();
-//					String[] split = zeile.split(";");
-//					
-//					// System.out.println( "Zeile " + markenZaehler + " : " + zeile );
-//					
-//					if(u ==1 && !split[0].equals("#"))
-//					{
-//						objArrTable[0][colCounter] = split[0];
-//						for(int i = 1; i < split.length; i++)
-//							objArrTable[i][colCounter] = split[i];
-//					}
-//					
-//					rowCounter = rowCounter < (split.length) ? split.length : rowCounter; 
-//					colCounter ++;
-//				}
-//				
-//				if(u == 0)
-//					objArrTable = new String[rowCounter][colCounter];
-//					
-//				scanner.close();
-//			}
-//		}
-//		catch (FileNotFoundException e) {}
-//
-//	}
-
 	//Wird nicht genutzt, aber vielleicht noch brauchbar
 	private int getArrayIndexOf(String[] arr, String s)
 	{
@@ -385,7 +333,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		String searchStr = s;
 		String[] searchArr = arr;
 		
-		for (int i = 0; i<searchArr.length;i++)
+		for (int i = 0; i < searchArr.length;i++)
 		{
 			if (searchArr[i] == s )
 				retValue = i;
@@ -403,8 +351,10 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	{
 		objArrTable = new Object[liLiMessungen.size()+1][strArrtableColNames.length];
 		//Tableheader im Array vorbereiten
+		
 		for (int i=0;i<strArrtableColNames.length;i++)
 			objArrTable[0][i] = strArrtableColNames[i];
+		
 		updateTableData(objArrTable);
 		readData();
 		
@@ -468,7 +418,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		//TODO : das ist noch nicht fertig... wird es wahrscheinlich auch nicht werden... 
 		int sourceHeader = in[0].length;
-//		int sourceLength= in.length;
 		int targetLength = 0;
 		int messID = -1;
 		int filterOccurence = 1;
@@ -502,7 +451,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		try
 		{
-			for (Messung m:liLiMessungen)
+			for (Messung m : liLiMessungen)
 			{
 				if (messID == -1 || m.getmID() == messID)
 					filterOccurence++;
@@ -533,22 +482,18 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 					nextIndex++;
 				}
 			}
-			
-//			updateTableData(newArray);
+		
 			return newArray;
-			
-		} 
-		catch (Exception e)
+		
+		} catch (Exception e)
 		{
 			setStatusBarText("nichts zu filtern...");
 			return objArrTable;
 		}
-		
-		
 	}
 
 	/**
-	 * Erweitert ein übergenes Object[][]
+	 * Erweitert ein übergebenes Object[][]
 	 * @param das zu erweiternde Object[][]
 	 */
 	
@@ -563,8 +508,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 
 		objArrTable = new Object[sourceLength+1][sourceHeader];
 		objArrTable = Arrays.copyOf(newArray, in.length+1);
-//		in = new Object[sourceLength+1][sourceHeader];
-//		in = Arrays.copyOf(newArray, in.length+1);
+
 	}
 	
 	/**
@@ -704,9 +648,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	 */
 	private void readData()
 	{
-		
-		System.out.println( "loadData() " + fileSave );
-		
 		liLiMessungen.clear();
 		Scanner in = null;
 		
@@ -758,12 +699,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 				default:
 					break;
 				}
-				
 			}
-			
-		} 
-		catch (Exception ex)
-		{}
+		} catch (Exception ex) {}
 		
 		if( in != null )
 			in.close();
