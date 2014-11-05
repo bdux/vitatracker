@@ -132,6 +132,10 @@ public class Messung
 		return messUnit;
 	}
 	
+	/**
+	 * Hilfsklasse um alle Werte aus dem Messungsobjekt auf der Konsole auszugeben
+	 * @return einen String, der alle Werte aus diesem Objekt beinhaltet.
+	 */
 	public String getAllData()
 	{
 		String s = "Messzeitpunkt:" + this.zp + ", LongDatum: " + this.numericDate  + ", Wert1: " + this.value1 +
