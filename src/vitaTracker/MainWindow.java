@@ -367,8 +367,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		connectionString = "jdbc:mysql://" + server + ":3306/";
 		connectionString += dataBase;
 		
-		// "jdbc:mysql://127.0.0.1:3306/alfatraining"
-		
 		dbEnabled( DBConnection.connectToDatabase(
 			classForName, connectionString, "root", null) );
 		
@@ -819,7 +817,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		btn.setEnabled(bool);
 	}
 
-	
 	
 	private class ReadFileIntoDatabase implements Runnable
 	{
