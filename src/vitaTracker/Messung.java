@@ -131,5 +131,15 @@ public class Messung
 	{
 		return messUnit;
 	}
+	
+	public String getAllData()
+	{
+		String s = "Messzeitpunkt:" + this.zp + ", LongDatum: " + this.numericDate  + ", Wert1: " + this.value1 +
+					", Wert2: " + this.value2 + ", Str messart: " + this.messArtStr + ", Messeinheit: " + this.messUnit + 
+					", MessArtID: " + this.mID;
+		System.out.println(s);
+		
+		return s;
+	}
 
 }

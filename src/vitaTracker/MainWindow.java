@@ -204,10 +204,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		cBoxMsngUnit.setPreferredSize(new Dimension(75,25));
 		cBoxMsngUnit.addItemListener(this);
 		pnHdPnlLnSt.add(cBoxMsngUnit, blPnHdPnlLnSt.LINE_END);
-		
+
 		// LineStart im HeadPanel
-		
-	
 		// Eingabepanel
 		
 		lblVal1 			= new JLabel("Systolischer Wert");
@@ -232,7 +230,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 				
 		tfMessZeit = new JTextField(sDForm.format(dateMessung).toString());
 		tfMessZeit.setBounds(15, 180, 150, 25);
-		tfMessZeit.setEnabled(false);
+		tfMessZeit.setFocusable(false);
 		pnEingabeInner.add(tfMessZeit);
 		
 		btnMessZeitSetzen 	= new JButton(">");
@@ -251,7 +249,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		btnMessCommit 		= new JButton("Messungen Sichern");
 		btnMessCommit.addActionListener(this);
 		btnMessCommit.setEnabled(false);
-		pnBtnFoot.add(btnMessCommit);
+//		pnBtnFoot.add(btnMessCommit);
 		
 		btnOpenChart 		= new JButton("Diagramm anzeigen");
 		btnOpenChart.addActionListener(this);
@@ -300,7 +298,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			lblVal1.setText("Systolischer Wert");
 			lblVal2.setText("Diastolischer Wert");
 			lblVal2.setVisible(true);
-			tfVal2.setEnabled(true);
+			tfVal2.setVisible(true);
 			tfVal2.setEnabled(true);
 			
 			break;
@@ -312,6 +310,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			lblVal1.setText("Blutzuckerwert");
 			lblVal2.setVisible(false);
 			tfVal2.setText(null);
+			tfVal2.setVisible(false);
 			tfVal2.setEnabled(false);
 
 			
@@ -322,8 +321,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			cBoxMsngUnit.addItem(strArrMessUnits[WEIGHT_METRIC]);
 			cBoxMsngUnit.addItem(strArrMessUnits[WEIGHT_IMPERIAL]);
 			lblVal1.setText("Gewicht");
-			lblVal2.setVisible(false);
 			tfVal2.setText(null);
+			lblVal2.setVisible(false);
+			tfVal2.setVisible(false);
 			tfVal2.setEnabled(false);
 			
 			
@@ -497,14 +497,14 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			case M_STR_ALLE:
 				setStatusBarText("Alle Filter entfernt.");
 //				updateTableData(objArrTable);
-				return objArrTable;
+//				return objArrTable;
 		}
 		
 		try
 		{
 			for (Messung m:liLiMessungen)
 			{
-				if (m.getmID() == messID)
+				if (messID == -1 || m.getmID() == messID)
 					filterOccurence++;
 			}
 			
@@ -516,7 +516,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			
 			for(Messung m:liLiMessungen)
 			{
-				if (m.getmID() == messID)
+				if (messID == -1 ||  m.getmID() == messID)
 				{
 					newArray[nextIndex][0] = m.getStrMessArt();
 					if (messID == BLUTDRUCK)
@@ -839,7 +839,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			readData();
 		else if (o == miSave | o == btnMessCommit)
 			saveData();
-		else if (o == btnOpenChart)
+		else if (o == btnOpenChart )
 		{
 			showDiagram(liLiMessungen);
 		}

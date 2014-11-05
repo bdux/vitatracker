@@ -2,10 +2,10 @@ package vitaTracker;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 
 import javax.swing.*;
@@ -13,16 +13,16 @@ import javax.swing.*;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.plot.CombinedDomainXYPlot;
-import org.jfree.chart.plot.Plot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.PlotState;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.data.general.Dataset;
+import org.jfree.data.time.Day;
+import org.jfree.data.time.Minute;
+import org.jfree.data.time.Month;
+import org.jfree.data.time.RegularTimePeriod;
+import org.jfree.data.time.Second;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.time.Week;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -38,9 +38,9 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 	
 	private LinkedList<Messung> data;
 //	private DataSet dataset;
-	private XYDataset bpSysDataset, bpDiaDataset, glucoDataSet, weightDataset;
+//	private XYDataset bpSysDataset, bpDiaDataset, glucoDataSet, weightDataset;
 	private JFreeChart jChart;
-	
+	private XYPlot plot;
 	
 	protected double[] systolicvalues;
 	protected double[] diastolicValues;
@@ -115,72 +115,86 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 	private void initChartData()
 	{
 		readDataIntoArrays(data);
-       	bpSysDataset = DataSet.dataset(systolicvalues, bpDates, "Syst");
-       	bpDiaDataset= DataSet.dataset(diastolicValues, bpDates, "Dias");
-       	bpSysDataset = DataSet.dataset(glucoValues, glucoDates, "Gluc");
-       	bpSysDataset = DataSet.dataset(weightValues, weightDates, "Gew");
+//       	bpSysDataset = DataSet.dataset(systolicvalues, bpDates, "Syst");
+//       	bpDiaDataset= DataSet.dataset(diastolicValues, bpDates, "Dias");
+//       	bpSysDataset = DataSet.dataset(glucoValues, glucoDates, "Gluc");
+//       	bpSysDataset = DataSet.dataset(weightValues, weightDates, "Gew");
     
 	}
 
 	/**
 	 * 
 	 */
+	
+		
+	
+	private TimeSeries createVitaSeries(double[] values, long[] dates,final String name) 
+	{
+        final TimeSeries timeSeries = new TimeSeries(name);
+//        RegularTimePeriod t = new Day();
+ 
+        
+        for (int i = 0; i<values.length;i++) 
+        {
+        	timeSeries.addOrUpdate(new Second(new Date(dates[i])), values[i]);
+        }
+        return timeSeries;
+	}
+	
+	private XYDataset createDataset() 
+	{
+        TimeSeriesCollection tsc = new TimeSeriesCollection();
+        tsc.addSeries(createVitaSeries(systolicvalues, bpDates, "Systol"));
+        tsc.addSeries(createVitaSeries(diastolicValues,bpDates, "Dias"));
+        tsc.addSeries(createVitaSeries(glucoValues, glucoDates, "Gluc"));
+        tsc.addSeries(createVitaSeries(weightValues, weightDates, "Gewicht"));
+        
+        return tsc;
+	}
+	
 	private void drawChart()
 	{
-		
-		XYLineAndShapeRenderer line = new XYLineAndShapeRenderer();
-		NumberAxis yaxSys = new NumberAxis("Syst");
-		NumberAxis yaxDias = new NumberAxis("Diast");
-		NumberAxis yaxGluc = new NumberAxis("Gluc");
-		NumberAxis yaxWeigh = new NumberAxis("Gewicht");
-		
-		ValueAxis xax = new DateAxis("Zeitpunkt");
-		CombinedDomainXYPlot mainPlot = new CombinedDomainXYPlot();
-		
-		XYPlot sysPlot = new XYPlot(bpSysDataset, xax, yaxSys, line);
-		mainPlot.add(sysPlot);
-		
-		XYPlot diasPlot = new XYPlot(bpDiaDataset, xax, yaxDias, line);
-		mainPlot.add(diasPlot);
-		
-		XYPlot glucoPlot = new XYPlot(glucoDataSet, xax, yaxGluc, line);
-		mainPlot.add(glucoPlot);
-		
-		XYPlot weightPlot = new XYPlot(weightDataset, xax, yaxWeigh, line);
-		mainPlot.add(weightPlot);
-		
-		
-		jChart = new JFreeChart(mainPlot);
-		
+		XYDataset VitaChartData = createDataset();
+		jChart = ChartFactory.createTimeSeriesChart(
+				null, "Zeitpunkt", "Messwert", VitaChartData, true, true, false);
+		 XYPlot plot = jChart.getXYPlot();
+	        XYLineAndShapeRenderer renderer =
+	            (XYLineAndShapeRenderer) plot.getRenderer();
+	        renderer.setBaseShapesVisible(true);
 		ChartPanel chartPanel = new ChartPanel(jChart);
 		this.add(chartPanel);
 		
 	}
 	
-	
 	public void readDataIntoArrays(LinkedList<Messung> in)
 	{
-		for (int i = 0; i<in.size();i++)
+		
+		
+		for (Messung m:in)
 		{
-			m = in.get(i);
+//			m = in.get(i);
 						
 			if (m.getmID() == MainWindow.BLUTDRUCK)
 			{
 				bpCount++;
+				System.out.println("bpCount: " + bpCount);
 			}
 			else if (m.getmID() == MainWindow.BLUTZUCKER)
 			{
 				glucoCount++;
+				System.out.println("glucoCount: " + glucoCount);
 			}
 			else if (m.getmID() == MainWindow.GEWICHT)
 			{
 				weightCount++;
+				System.out.println("weightCount: " + weightCount);
 			}
 		}
 
 		systolicvalues = new double[bpCount];
 		diastolicValues = new double[bpCount];
 		bpDates = new long[bpCount];
+		System.out.println("sys[]length: " + systolicvalues.length);
 		
 		glucoValues = new double[glucoCount];
 		glucoDates = new long[glucoCount];
@@ -188,44 +202,50 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 		weightValues = new double[weightCount];
 		weightDates = new long[weightCount];
 		
+		int bpC=0, glC=0, wC = 0;
 		
-		for (int counter = 0;counter<in.size(); counter++)
+		for (Messung m : in)
 		{
-			int bpC=0, glC=0, wC = 0;
-			switch (in.get(counter).getmID())
+			
+			switch (m.getmID())
 			{
 			case MainWindow.BLUTDRUCK:
-				if(bpC<=bpCount)
-				{
-					systolicvalues[bpC] = m.getValue1();
-					diastolicValues[bpC] = m.getValue2();
-					bpDates[bpC] = m.getNumericDate();
-					bpC++;
-				}
+				m.getAllData(); //hilfsmethode... 
+				systolicvalues[bpC] = m.getValue1();
+				diastolicValues[bpC] = m.getValue2();
+				bpDates[bpC] = m.getNumericDate();
+				bpC++;
+				
 				break;
 			
 			case MainWindow.BLUTZUCKER:
-				if(glC<=glucoCount)
-				{
-					glucoValues[glC] = m.getValue1();
-					glucoDates[glC] = m.getNumericDate();
-					glC++;
-				}
+				m.getAllData(); //hilfsmethode... 
+				glucoValues[glC] = m.getValue1();
+				glucoDates[glC] = m.getNumericDate();
+				glC++;
+			
 				break;
 			
 			case MainWindow.GEWICHT:
-				if(wC <= weightCount)
-				{
-					glucoValues[wC] = m.getValue1();
-					weightDates[wC] = m.getNumericDate();
-					wC++;
-				}
+				m.getAllData(); //hilfsmethode... 
+				weightValues[wC] = m.getValue1();
+				weightDates[wC] = m.getNumericDate();
+				wC++;
+			
 				break;
 
 			default:
 				break;
 			}
+			
+			
 		}
+		
+		for (int i = 0; i<bpCount;i++)
+			System.out.println(i+ " , " +systolicvalues[i]+ " , "+ diastolicValues[i]+" , " + new SimpleDateFormat("HH:mm, dd.MM.yyyy").format(new Date(bpDates[i])));
+		
+		
+		
 	}
 
 	public void Show()
