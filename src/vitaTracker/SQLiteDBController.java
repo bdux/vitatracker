@@ -3,10 +3,6 @@
  */
 package vitaTracker;
 
-/**
- * @author Alfa
- *
- */
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -17,6 +13,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedList;
 
+/**
+ * @deprecated
+ * @author Alfa
+ * 
+ * work in Progress...
+ *
+ */
 public class SQLiteDBController {
     
 //    private static final SQLiteDBController dbcontroller = SQLiteDBController();

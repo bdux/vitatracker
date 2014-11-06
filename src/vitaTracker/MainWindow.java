@@ -4,31 +4,17 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Scanner;
-import java.sql.Statement;
 import javax.swing.*;
-
-import org.jfree.chart.ChartPanel;
-
-import vitaTracker.Util.Globals;
 import vitaTracker.Messung.messArtEnum;
 import vitaTracker.Util.DateTimePicker;
-//import vitaTracker.Util.SQLiteDBController;
 import vitaTracker.Util.StatusBar;
 import vitaTracker.Util.WinUtil;
-import vitaTracker.Util.DBConnection;
+
 /**
  * 
  * @author Benjamin Dux
@@ -45,7 +31,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private SQLiteDBController	dbc;
 	private JButton				btnFelderLoeschen, btnDatenHolen, btnMessZeitSetzen, btnMessCommit;
 	private JButton				btnMessAdd;
-	protected JButton	/*temporär: */ btnOpenChart;
+	protected JButton			btnOpenChart;
 	private JMenuBar 			menuBar;
 	private JMenu 				menDatei, menExtras, submenEval, submenDB;
 	private JMenuItem 			miLoad, miSave, miExit, miEvalTable, miEvalChart, miOpenDBConn, miCloseDBConn;
@@ -155,24 +141,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		sbStaBarMainWin.setMessage("Bereit");
 		this.add(sbStaBarMainWin, blFrameLayout.PAGE_END);
 		
-		
-		progressBar = new JProgressBar(JProgressBar.HORIZONTAL);
-		progressBar.setBorderPainted(true);
-		progressBar.setPreferredSize( new Dimension(300, sbStaBarMainWin.getHeight()));
-
-		// Balkenfarbe
-		//
-		progressBar.setForeground(Color.GREEN);
-		
-		// Initial auf invisible
-		//
-		progressBar.setVisible(false);
-		
-		// Zur Statusbar hinzufÃ¼gen (rechts)
-		//
-		sbStaBarMainWin.add(progressBar, BorderLayout.LINE_END);
-		
-		
 		pnEingabe 			= new JPanel();
 		pnEingabe.setLayout(blEgPnl);
 		pnEingabe.setPreferredSize(new Dimension(200,250));
@@ -199,8 +167,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		pnFilter.setLayout(blFlterPl);
 		pnFilter.setBackground(pnHeadPanel.getBackground());
 		pnHeadPanel.add(pnFilter, blHdPn.LINE_END);
-
-
 		
 		lblFilterSelect 	= new JLabel("Filtern nach: ");
 		lblFilterSelect.setPreferredSize(new Dimension(200, 25));
@@ -270,12 +236,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		btnMessAdd.setEnabled(true);
 		pnBtnFoot.add(btnMessAdd);
 		
-		// Funktion erst mit DB Anbindung, fraglich ob bis zum Ende machbar.
-		btnMessCommit 		= new JButton("Messungen Sichern");
-		btnMessCommit.addActionListener(this);
-		btnMessCommit.setEnabled(false);
-		pnBtnFoot.add(btnMessCommit);
-		
 		btnOpenChart 		= new JButton("Diagramm anzeigen");
 		btnOpenChart.addActionListener(this);
 		pnBtnFoot.add(btnOpenChart);
@@ -285,20 +245,12 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		menDatei = WinUtil.createMenu(menuBar, "Datei", "menuName", 'D');
 		menExtras = WinUtil.createMenu(menuBar, "Extras", "Extras", 'X');
 		submenEval = WinUtil.createSubMenu(menExtras, "Auswertung", "Auswertung", 'W');
-		submenDB = WinUtil.createSubMenu(menExtras, "DB Verbindung", "DB Verbindung", 'V');
 		subMenBtnGrp = new ButtonGroup();
 		
 		
 		miLoad = WinUtil.createMenuItem(menDatei, "Laden", WinUtil.MenuItemType.ITEM_PLAIN, this, "Laden", null, 'L', null);
 		miSave = WinUtil.createMenuItem(menDatei, "Speichern", WinUtil.MenuItemType.ITEM_PLAIN, this, "Speichern", null, 'A', null);
 		miExit = WinUtil.createMenuItem(menDatei, "Beenden", WinUtil.MenuItemType.ITEM_PLAIN, this, "Beenden", null, 'N', null);
-		
-		miOpenDBConn = WinUtil.createMenuItem(submenDB, "Verdbindung öffnen", WinUtil.MenuItemType.ITEM_PLAIN, this, "Verbindung Öffnen", null, 'F', null);
-		miCloseDBConn = WinUtil.createMenuItem(submenDB, "Verdbindung schließen", WinUtil.MenuItemType.ITEM_PLAIN, this, "Verbindung schließen", null, 'L', null);
-		miCloseDBConn.setEnabled(false);
-//		miEvalTable = WinUtil.createMenuItem(submenEval, "Tabelle", WinUtil.MenuItemType.ITEM_RADIO, this, "Tabellarisch", null, 'L',null);
-//		miEvalTable.setSelected(true);
-//		subMenBtnGrp.add(miEvalTable);
 		
 		miEvalChart = WinUtil.createMenuItem(submenEval, "Diagramm", WinUtil.MenuItemType.ITEM_RADIO, this, "Grafisch", null, 'R',null);
 		miEvalChart.setSelected(true);
@@ -312,6 +264,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	
 	/**
+	 * TODO: zeigen!
 	 * Ändert die Ansicht für das Eingabepanel entsprechend der auswahl der cBoxMessArten
 	 * <br></br>
 	 * @param int messung: Integer Wert zur Übergabe and das Messeinheiten Array 
@@ -359,40 +312,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			
 			break;
 		}
-		
-	}
-	
-	
-	private void openMySQLDatabase()
-	{
-		String connectionString, classForName;
-		
-		String server ="localhost";
-		String dataBase = "vitatrack";
-		classForName = "com.mysql.jdbc.Driver";
-		
-		connectionString = "jdbc:mysql://" + server + ":3306/";
-		connectionString += dataBase;
-		
-		dbEnabled( DBConnection.connectToDatabase(
-			classForName, connectionString, "root", null) );
-		
-	}
-	
-	
-	private void dbEnabled(boolean enabled)
-	{
-		miOpenDBConn.setEnabled(!enabled);
-		miCloseDBConn.setEnabled(enabled);
-		btnMessCommit.setEnabled(miCloseDBConn.isEnabled());
-		
-		if(!enabled)
-		{
-			sbStaBarMainWin.setMessage("Datenbank: (keine)");
-			sbStaBarMainWin.setToolTipText("");
-		}	
-		else
-			sbStaBarMainWin.setMessage("Datenbank: (geöffnet)");
 		
 	}
 	
@@ -480,6 +399,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 	
 	/**
+	 * TODO: zeigen!
 	 * @param in das zu Filternde Object[][]
 	 * @return das Object[][] das neben dem Header für die Tabelle nur noch die Messungsobjekte mit der gesuchten mID haben
 	 */
@@ -580,6 +500,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 	
 	/**
+	 * TODO: zeigen!
 	 * erzeugt ein Messungsobjekt, unter Berücksichtigung des Ausgewählten indexes der cBoxMessArt 
 	 * und der ausgewählten Messungseinheit in cBoxMsngUnit.
 	 */
@@ -712,6 +633,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 
 	/**
+	 * 
 	 * liest eine Textdatei ein und erzeugt Messungen aus semikolon-separierten Zeilen.
 	 */
 	private void readData()
@@ -773,10 +695,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		if( in != null )
 			in.close();
 	}
-		
 	
 	/**
-	 * 
+	 * Zeigt ein externes JFrame mit eingebettetem JFreeChart 
 	 */
 	private void showDiagram(LinkedList<Messung> dataList)
 	{
@@ -804,7 +725,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		tfMessZeit.setText(sDForm.format(dateMessung).toString());
 	}
 	
-	
 	/**
 	 * setzt den Text der Statusbar im Hauptfenster.
 	 * @param s der zu setzende Text.
@@ -823,38 +743,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		btn.setEnabled(bool);
 	}
 
-	
-	
-	
-	
-	private boolean insertMessung(long timestamp, double val1, double val2, String messUnit, int messArtID )
-	{
-		
-		
-		
-		
-		String sql = "INSERT INTO messungen ";
-		sql += "( val1, val2, messArtStr, messUnit, messArtID, timestamp ) ";
-		sql += "VALUES (";
-		sql += Double.toString(val1) + ", ";
-		sql += Double.toString(val2) + ", ";
-		sql += messUnit + ", ";
-		sql += Integer.toString(messArtID) + ", ";
-		sql += Long.toString(timestamp) + ")";
-		
-		return DBConnection.executeNonQuery(sql) > 0;
-		
-		
-		/*
-		 *   INSERT INTO tn ( pk, plz, ort ) VALUES ( 109, '68165', 'Mannheim' )
-		 */
-		
-		
-		
-	}
-	
-	
-	
 	/*die Listener-Methoden*/
 	
 	@Override
@@ -875,36 +763,13 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		
 		else if (o == miLoad)
 			readData();
+		
 		else if (o == miSave)
 			saveData();
+		
 		else if (o == btnOpenChart )
 			showDiagram(liLiMessungen);
-		else if (o == miOpenDBConn)
-		{
-			dbc = new SQLiteDBController(liLiMessungen);
-			dbc.initDBConnection();
-			btnMessCommit.setEnabled(true);
-//			openMySQLDatabase();
-		}
-		else if(o == miCloseDBConn)
-		{	
-			DBConnection.closeConnection();
-			dbEnabled(false);
-		}
-		else if (o == btnMessCommit)
-		{
-
-	        dbc.addToDB();
-	        btnMessCommit.setEnabled(false);
-	        dbEnabled(false);
-			//			for (Messung m : liLiMessungen)
-//			insertMessung(m.getNumericDate(), m.getValue1(), m.getValue2(), m.getMessUnit(), m.getmID());
-		}
 	}
-
-	/**
-	 * 
-	 */
 
 	@Override
 	public void windowActivated(WindowEvent e){}
@@ -946,9 +811,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		{
 			updateTableData(filterTable(objArrTable));
 		}
-		
 	}
-	
 	
 	public static void main(String[] args)
 		{
