@@ -82,16 +82,18 @@ public class Messung
 	
 	/**
 	 * gibt den Wert der Messung zurück. Zu beachten ist hier, dass man zwar einen int übergibt, die Messwerte
-	 * aber als double vorliegen - und zwar in einem double[]. val ist hier der index des zu holenden Messwerts.
-	 * wert[1] wird nur im Falle einer Blutdruckmessung gebraucht.
-	 * @param val double Messwert am index val.
-	 * @return
+	 * aber als double vorliegen
+	 * 
+	 * @return double value1 Messwert. 
 	 */
 	public double getValue1()
 	{
 		return this.value1;
 	}
-	
+	/**
+	 * Wird nur für Blutdruck gebraucht - diastolischer Wert.
+	 * @return value2 double Wert.
+	 */
 	public double getValue2()
 	{
 		return this.value2;
