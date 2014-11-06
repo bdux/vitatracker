@@ -449,7 +449,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			System.arraycopy(in,0,newArray,0,targetLength);
 			
 			
-			for(Messung m:liLiMessungen)
+			for(Messung m : liLiMessungen)
 			{
 				if (messID == -1 ||  m.getmID() == messID)
 				{
@@ -816,6 +816,4 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			MainWindow mw = new MainWindow();
 			mw.Show();
 		}
-	
-	
 }
