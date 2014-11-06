@@ -32,8 +32,6 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 	protected static JScrollPane imgScrllPane;
 	
 	private LinkedList<Messung> data;
-//	private DataSet dataset;
-//	private XYDataset bpSysDataset, bpDiaDataset, glucoDataSet, weightDataset;
 	protected JFreeChart jChart;
 	private XYPlot plot;
 	
@@ -51,8 +49,6 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 	private int bpCount = 0;
 	private int glucoCount = 0;
 	private int weightCount = 0;
-	
-	
 	
 	public VitaChartFrame(MainWindow owner, LinkedList<Messung> data)
 	{
@@ -95,7 +91,6 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 		initChartData();
 		drawChart();
 	}
-	
 
 	/**
 	 * 
@@ -106,11 +101,12 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 	}
 	
 	/**
-	 * 
+	 * Erzeugt eine Datenserie zur Übergabe an ein Dataset.
+	 * @param values Array von Messwerten
+	 * @param dates	Array von Daten im Long format
+	 * @param name der Name für die Datenserie
+	 * @return eine Datenserie zur Übergabe an das Dataset.
 	 */
-	
-		
-	
 	private TimeSeries createVitaSeries(double[] values, long[] dates,final String name) 
 	{
         final TimeSeries timeSeries = new TimeSeries(name);
@@ -122,6 +118,12 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
         return timeSeries;
 	}
 	
+	/**
+	 * Erzeugt ein Dataset zum Übergeben an den Plot
+	 * hier werden letztendlich die Daten für die einzelnen Messarten gebündelt um dann vom 
+	 * Plot gezeichnet zu werden.	 * 
+	 * @return das zu übergebende Dataset.
+	 */
 	private XYDataset createDataset() 
 	{
         TimeSeriesCollection tsc = new TimeSeriesCollection();
@@ -133,6 +135,9 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
         return tsc;
 	}
 	
+	/**
+	 * erzeugt ein ChartPanel, das den zu zeichnenden Chart enthält und setzt es auf den Frame.
+	 */
 	private void drawChart()
 	{
 		XYDataset VitaChartData = createDataset();
@@ -146,6 +151,10 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 		this.add(chartPanel);
 	}
 	
+	/**
+	 * Daten aus der übergebenen Linkedlist werden in Arrays gelesen, vorbereitend zum erstellen der Dataseries.
+	 * @param in die zu bearbeitende Linkendlist
+	 */
 	public void readDataIntoArrays(LinkedList<Messung> in)
 	{
 		
@@ -217,7 +226,9 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 	{
 		this.setVisible(true);
 	}
-
+	
+	/* die Listener Methoden */
+	
 	@Override
 	public void mouseDragged(MouseEvent e) {}
 
