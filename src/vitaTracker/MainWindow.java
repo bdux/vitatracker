@@ -26,6 +26,7 @@ import vitaTracker.Util.DBConnection;
 /**
  * 
  * @author Benjamin Dux
+ * @version 1.0
  *
  */
 public class MainWindow extends JFrame implements ActionListener, WindowListener, ItemListener
