@@ -654,7 +654,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 							new Date(Long.parseLong(splitted[0])),
 							Double.parseDouble(splitted[1]),
 							Double.parseDouble(splitted[2]),
-							splitted[3],
+							splitted[3].intern(),
 							messArtEnum.blutDruck);
 
 					addMessungToLinkedList(mObjMessung);
@@ -666,7 +666,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 							new Date(Long.parseLong(splitted[0])),
 							Double.parseDouble(splitted[1]),
 							Double.parseDouble(splitted[2]),
-							splitted[3],
+							splitted[3].intern(),
 							messArtEnum.blutZucker);
 					
 					addMessungToLinkedList(mObjMessung);
@@ -678,7 +678,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 							new Date(Long.parseLong(splitted[0])),
 							Double.parseDouble(splitted[1]),
 							Double.parseDouble(splitted[2]),
-							splitted[3] ,messArtEnum.gewicht);
+							splitted[3].intern(),
+							messArtEnum.gewicht);
 					
 					addMessungToLinkedList(mObjMessung);
 					addTableEntry();
