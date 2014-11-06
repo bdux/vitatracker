@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.sql.Statement;
+
 import javax.swing.*;
 
 import org.jfree.chart.ChartPanel;
@@ -363,6 +364,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 	
 	
+	// wird nicht genutzt, funktioniert aber prinzipiell.
 	private void openMySQLDatabase()
 	{
 		String connectionString, classForName;
@@ -824,37 +826,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 
 	
-	
-	
-	
-	private boolean insertMessung(long timestamp, double val1, double val2, String messUnit, int messArtID )
-	{
-		
-		
-		
-		
-		String sql = "INSERT INTO messungen ";
-		sql += "( val1, val2, messArtStr, messUnit, messArtID, timestamp ) ";
-		sql += "VALUES (";
-		sql += Double.toString(val1) + ", ";
-		sql += Double.toString(val2) + ", ";
-		sql += messUnit + ", ";
-		sql += Integer.toString(messArtID) + ", ";
-		sql += Long.toString(timestamp) + ")";
-		
-		return DBConnection.executeNonQuery(sql) > 0;
-		
-		
-		/*
-		 *   INSERT INTO tn ( pk, plz, ort ) VALUES ( 109, '68165', 'Mannheim' )
-		 */
-		
-		
-		
-	}
-	
-	
-	
 	/*die Listener-Methoden*/
 	
 	@Override
@@ -881,14 +852,16 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			showDiagram(liLiMessungen);
 		else if (o == miOpenDBConn)
 		{
-			dbc = new SQLiteDBController(liLiMessungen);
-			dbc.initDBConnection();
-			btnMessCommit.setEnabled(true);
-//			openMySQLDatabase();
+//			dbc = new SQLiteDBController(liLiMessungen);
+//			dbc.initDBConnection();
+//			btnMessCommit.setEnabled(true);
+//			dbEnabled(true);
+			openMySQLDatabase();
 		}
 		else if(o == miCloseDBConn)
 		{	
 			DBConnection.closeConnection();
+//			dbc.closeDB();
 			dbEnabled(false);
 		}
 		else if (o == btnMessCommit)
@@ -896,7 +869,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 
 	        dbc.addToDB();
 	        btnMessCommit.setEnabled(false);
-	        dbEnabled(false);
+//	        dbc.closeDB();
+	        dbEnabled(!dbc.closeDB());
+	        
 			//			for (Messung m : liLiMessungen)
 //			insertMessung(m.getNumericDate(), m.getValue1(), m.getValue2(), m.getMessUnit(), m.getmID());
 		}

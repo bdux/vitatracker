@@ -17,10 +17,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedList;
 
-public class SQLiteDBController {
+public class SQLiteDBController 
+{
     
-//    private static final SQLiteDBController dbcontroller = SQLiteDBController();
-    private static Connection connection;
+//    private static SQLiteDBController dbcontroller = new SQLiteDBController();
+    public static Connection connection;
     private static final String DB_PATH = "vitatracker.db";
     private LinkedList<Messung> readLiList;
     
@@ -42,7 +43,8 @@ public class SQLiteDBController {
 //        return dbcontroller;
 //    }
     
-    public void initDBConnection() {
+    public void initDBConnection() 
+    {
         try {
             if (connection != null)
                 return;
@@ -68,7 +70,28 @@ public class SQLiteDBController {
             }
         });
     }
-
+    
+    public boolean closeDB()
+    {
+    	boolean ret = false;
+    	
+    	 try {
+             if (!connection.isClosed() && connection != null) {
+                 connection.close();
+                 if (connection.isClosed())
+                 {
+                	 System.out.println("Connection to Database closed");
+                	 ret = true;
+                 }
+             }
+         } catch (SQLException e) {
+             e.printStackTrace();
+         }
+    	
+    	
+    	return ret;
+    }
+    
     public void addToDB() 
     {
 
@@ -81,7 +104,7 @@ public class SQLiteDBController {
             for (Messung m : readLiList)
             {
 	            PreparedStatement ps = connection
-	                    .prepareStatement("INSERT INTO messungen (val1,val2,messArtStr,messUnitStr,date,numericdate,mID) VALUES (?, ?, ?, ?, ?, ?, ?);");
+	                    .prepareStatement("INSERT INTO messungen (val1,val2,messArtStr,messUnitStr,numericdate,date,mID) VALUES (?, ?, ?, ?, ?, ?, ?);");
 	
 	            
 	            ps.setDouble(1, m.getValue1());
