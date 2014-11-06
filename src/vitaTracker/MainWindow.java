@@ -852,16 +852,16 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 			showDiagram(liLiMessungen);
 		else if (o == miOpenDBConn)
 		{
-//			dbc = new SQLiteDBController(liLiMessungen);
-//			dbc.initDBConnection();
-//			btnMessCommit.setEnabled(true);
-//			dbEnabled(true);
-			openMySQLDatabase();
+			dbc = new SQLiteDBController(liLiMessungen);
+			dbc.initDBConnection();
+			btnMessCommit.setEnabled(true);
+			dbEnabled(true);
+//			openMySQLDatabase();
 		}
 		else if(o == miCloseDBConn)
 		{	
-			DBConnection.closeConnection();
-//			dbc.closeDB();
+//			DBConnection.closeConnection();
+			dbc.closeDB();
 			dbEnabled(false);
 		}
 		else if (o == btnMessCommit)
