@@ -202,6 +202,9 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 			
 			case MainWindow.BLUTZUCKER:
 
+				if (m.getMessUnit() == MainWindow.UN_GLUCO_MOL)
+					glucoValues[glC] = (18.2*(m.getValue1()));
+				else
 				glucoValues[glC] = m.getValue1();
 				glucoDates[glC] = m.getNumericDate();
 				glC++;
@@ -210,6 +213,9 @@ public class VitaChartFrame extends JFrame implements WindowListener, MouseMotio
 			
 			case MainWindow.GEWICHT:
 				 
+				if (m.getMessUnit() == MainWindow.UN_WEIGHT_IMPERIAL)
+					weightValues[wC] = (m.getValue1())/2.2046;
+				else
 				weightValues[wC] = m.getValue1();
 				weightDates[wC] = m.getNumericDate();
 				wC++;
