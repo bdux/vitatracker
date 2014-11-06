@@ -28,13 +28,12 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	private JPanel 				pnBtnFoot, pnFilter;
 	private JPanel				pnHeadPanel,pnHdPnlLnSt;
 	private JPanel				pnEingabe, pnEingabeInner;
-	private SQLiteDBController	dbc;
-	private JButton				btnFelderLoeschen, btnDatenHolen, btnMessZeitSetzen, btnMessCommit;
+	private JButton				btnMessZeitSetzen;
 	private JButton				btnMessAdd;
 	protected JButton			btnOpenChart;
 	private JMenuBar 			menuBar;
 	private JMenu 				menDatei, menExtras, submenEval, submenDB;
-	private JMenuItem 			miLoad, miSave, miExit, miEvalTable, miEvalChart, miOpenDBConn, miCloseDBConn;
+	private JMenuItem 			miLoad, miSave, miExit, miEvalTable, miEvalChart;
 	private JLabel				lblVal1, lblVal2, lblMessZeit, lblFilterSelect;
 	private JTextField			tfMessZeit;
 	private ValueField			tfVal1, tfVal2;
@@ -51,7 +50,6 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	public LinkedList<Messung>	liLiMessungen;
 	private Object[][]			objArrTable;
 	public StatusBar			sbStaBarMainWin;
-	private JProgressBar		progressBar;
 	private BorderLayout		blFrameLayout, blEgPnl, blHdPn, blPnHdPnlLnSt;
 	private GridLayout			blFltrPn, blFlterPl;
 	private final String 		fileRead = "Messungen.txt";
