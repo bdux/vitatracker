@@ -229,7 +229,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		btnMessZeitSetzen.addActionListener(this);
 		pnEingabeInner.add(btnMessZeitSetzen);
 
-		btnMessAdd 			= new JButton("Messung hinzufügen");
+		btnMessAdd 			= new JButton("Messung hinzufÃ¼gen");
 		btnMessAdd.addActionListener(this);
 		btnMessAdd.setEnabled(true);
 		pnBtnFoot.add(btnMessAdd);
@@ -238,7 +238,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		btnOpenChart.addActionListener(this);
 		pnBtnFoot.add(btnOpenChart);
 		
-		//Menüleiste
+		//MenÃ¼leiste
 		menuBar 			= new JMenuBar();
 		menDatei = WinUtil.createMenu(menuBar, "Datei", "menuName", 'D');
 		menExtras = WinUtil.createMenu(menuBar, "Extras", "Extras", 'X');
@@ -263,9 +263,9 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	/**
 	 * TODO: zeigen!
-	 * Ändert die Ansicht für das Eingabepanel entsprechend der auswahl der cBoxMessArten
+	 * Ã„ndert die Ansicht fÃ¼r das Eingabepanel entsprechend der auswahl der cBoxMessArten
 	 * <br></br>
-	 * @param int messung: Integer Wert zur Übergabe and das Messeinheiten Array 
+	 * @param int messung: Integer Wert zur Ãœbergabe and das Messeinheiten Array 
 	 * 
 	 */
 	private void setUIEntries(int messung)
@@ -332,7 +332,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	/**
 	 * 
 	 * anlegen eines neuen Object[][] zur Weitergabe an das WindowTableModel,
-	 * erste Spalte bekommt die Strings für den Tabellenheader.
+	 * erste Spalte bekommt die Strings fÃ¼r den Tabellenheader.
 	 */
 	private void initData()
 	{
@@ -348,7 +348,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 	
 	/**
-	 * erzeugt ein neues WindowTableModel und setzt das WindowTableModel der tblMessung, was auch eine Neuzeichnung der Tabelle auslöst.
+	 * erzeugt ein neues WindowTableModel und setzt das WindowTableModel der tblMessung, was auch eine Neuzeichnung der Tabelle auslÃ¶st.
 	 * @param source das Object[][] das als Grundlage des WindowTableModels genutzt werden soll
 	 */
 	private void updateTableData(Object[][] source)
@@ -358,7 +358,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 
 	/**
-	 * Hilfsmethode zum befüllen der JTable
+	 * Hilfsmethode zum befÃ¼llen der JTable
 	 */
 	private void addTableEntry()
 	{
@@ -369,11 +369,11 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	/**
 	 * 
-	 * Befüllt ein Object[][] mit Attributen von Messungsobjekten, die in einer LinkedList vorgehalten werden.
+	 * BefÃ¼llt ein Object[][] mit Attributen von Messungsobjekten, die in einer LinkedList vorgehalten werden.
 	 * 
-	 * @param src die LinkedList<Messung>() als Quelle für die Daten
+	 * @param src die LinkedList<Messung>() als Quelle fÃ¼r die Daten
 	 * @param target das Object[][] als Ziel
-	 * @return das befüllte Object[][]
+	 * @return das befÃ¼llte Object[][]
 	 */
 	private Object[][] fillObjArray(LinkedList<Messung> src, Object[][]target)
 	{
@@ -399,7 +399,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	/**
 	 * TODO: zeigen!
 	 * @param in das zu Filternde Object[][]
-	 * @return das Object[][] das neben dem Header für die Tabelle nur noch die Messungsobjekte mit der gesuchten mID haben
+	 * @return das Object[][] das neben dem Header fÃ¼r die Tabelle nur noch die Messungsobjekte mit der gesuchten mID haben
 	 */
 	private Object[][] filterTable(Object[][] in)
 	{
@@ -479,7 +479,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 
 	/**
-	 * Erweitert ein übergebenes Object[][]
+	 * Erweitert ein Ã¼bergebenes Object[][]
 	 * @param das zu erweiternde Object[][]
 	 */
 	
@@ -499,8 +499,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	
 	/**
 	 * TODO: zeigen!
-	 * erzeugt ein Messungsobjekt, unter Berücksichtigung des Ausgewählten indexes der cBoxMessArt 
-	 * und der ausgewählten Messungseinheit in cBoxMsngUnit.
+	 * erzeugt ein Messungsobjekt, unter BerÃ¼cksichtigung des AusgewÃ¤hlten indexes der cBoxMessArt 
+	 * und der ausgewÃ¤hlten Messungseinheit in cBoxMsngUnit.
 	 */
 	private void createMessung()
 	{
@@ -529,10 +529,10 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 					}
 					
 					else
-					sbStaBarMainWin.setText("Der systolische Wert muss grösser als der Diastolische sein.");
+					sbStaBarMainWin.setText("Der systolische Wert muss grÃ¶sser als der Diastolische sein.");
 				}	
 				else
-					sbStaBarMainWin.setText("Messung kann nicht übernommen werden.");
+					sbStaBarMainWin.setText("Messung kann nicht Ã¼bernommen werden.");
 		
 				break;
 				
@@ -574,7 +574,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 		} 
 		catch (Exception e)
 		{
-			sbStaBarMainWin.setText("Ungültige Eingabe");
+			sbStaBarMainWin.setText("UngÃ¼ltige Eingabe");
 		} 
 			
 		if (messWasCreated)
@@ -586,8 +586,8 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 	}
 	
 	/**
-	 * fügt ein Messungsobjekt zur LinkedList<Messung> liLiMessungen hinzu
-	 * @param m das hizuzufügende Messungsobjekt
+	 * fÃ¼gt ein Messungsobjekt zur LinkedList<Messung> liLiMessungen hinzu
+	 * @param m das hizuzufÃ¼gende Messungsobjekt
 	 */
 	private void addMessungToLinkedList(Messung m)
 	{
@@ -716,7 +716,7 @@ public class MainWindow extends JFrame implements ActionListener, WindowListener
 
 	/**
 	 * 
-	 * @param das zu setzende Messdatum, zur Übergabe an das tfMessZeit Textfeld.
+	 * @param das zu setzende Messdatum, zur Ãœbergabe an das tfMessZeit Textfeld.
 	 */
 	public void setDateMessung(Date dateMessung)
 	{
